@@ -43,7 +43,7 @@ def main():
         logger.warning("사용 가능한 카테고리가 없습니다.")
         return
 
-    cat_name = category["category_name"]
+    cat_name = category["category"]
     cat_id = category["id"]
     logger.info(f"카테고리: {cat_name} (id={cat_id})")
 
