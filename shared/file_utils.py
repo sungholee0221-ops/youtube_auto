@@ -8,30 +8,74 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 
+# 채널별 AI 공개 문구 (설명란 삽입용, 간결하게)
+_AI_DISCLOSURE = {
+    "rain":    "📌 제목·설명은 AI로 생성되었으며, 영상·음원은 라이선스 소스를 사용했습니다.",
+    "dino":    "📌 나레이션(Google TTS)·이미지(AI 생성)·제목/설명(Claude AI)을 활용하여 제작되었습니다.",
+    "history": "📌 나레이션(Google TTS)·이미지(AI 생성)·제목/설명(Claude AI)을 활용하여 제작되었습니다.",
+}
+
+# 업로드 체크리스트 (txt 하단 고정)
+_UPLOAD_CHECKLIST = (
+    "──────────────────────────────\n"
+    "[ 업로드 체크리스트 ]\n"
+    "⚠️  세부정보 → 연령제한(고급) → 변경된 콘텐츠 → YES 체크\n"
+    "──────────────────────────────"
+)
+
+
 def save_output(
     video_path: str,
     title: str,
     description: str,
     output_dir: str,
+    channel: str = "",
+    topic: str = "",
+    duration_label: str = "",
+    tags: list[str] | None = None,
     thumbnail_path: str | None = None,
 ) -> dict:
-    """완성된 영상과 메타데이터 txt를 출력 디렉토리에 저장한다."""
+    """완성된 영상과 메타데이터 txt를 출력 디렉토리에 저장한다.
+
+    파일명 형식: YYMMDD_channel_topic_duration  (예: 260329_rain_3h, 260330_dino_triceratops_5min)
+    txt 포함 항목: 제목 / 설명 / AI 공개 문구 / SEO 태그 (YouTube 복붙용)
+    """
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    safe_title = _sanitize_filename(title)
-    base_name = f"{date_str}_{safe_title}"
+    date_str = datetime.now().strftime("%y%m%d")
+    parts = [date_str]
+    if channel:
+        parts.append(channel)
+    if topic:
+        parts.append(_sanitize_filename(topic, max_len=20))
+    if duration_label:
+        parts.append(duration_label)
+    base_name = "_".join(parts)
 
     # mp4 복사
     dst_video = os.path.join(output_dir, f"{base_name}.mp4")
     shutil.copy2(video_path, dst_video)
     logger.info(f"영상 저장: {dst_video}")
 
-    # txt 저장 (제목 + 설명)
+    # txt 저장
     dst_txt = os.path.join(output_dir, f"{base_name}.txt")
     with open(dst_txt, "w", encoding="utf-8") as f:
         f.write(f"제목: {title}\n\n")
         f.write(f"설명:\n{description}\n")
+
+        # AI 공개 문구
+        disclosure = _AI_DISCLOSURE.get(channel, "")
+        if disclosure:
+            f.write(f"\n\n{disclosure}\n")
+
+        # SEO 태그 (YouTube 태그란에 복붙)
+        if tags:
+            f.write(f"\n\n태그 (YouTube 태그란 복붙용):\n")
+            f.write(",".join(tags) + "\n")
+
+        # 업로드 체크리스트
+        f.write(f"\n\n{_UPLOAD_CHECKLIST}\n")
+
     logger.info(f"메타데이터 저장: {dst_txt}")
 
     # 썸네일 복사

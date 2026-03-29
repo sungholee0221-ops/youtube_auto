@@ -1,12 +1,12 @@
 """
-채널 1 · 비소리/모닥불 자동화
+채널 1 · 비소리 자동화
 - 매주 수요일 자정 실행
-- Supabase에서 미사용 비소리 영상 1개 조회
-- FFmpeg으로 3시간 루프 영상 생성
+- Supabase generated_files에서 rain_video(영상) + rain_audio(오디오) 각각 조회
+- 앞 15분: Pexels 영상 / 나머지: 검은 화면 / 전체: 빗소리 MP3 루프
 - 첫 프레임 썸네일 캡처
 - Claude API로 제목/설명 생성
-- 로컬 저장 (mp4 + txt)
-- Supabase is_used 업데이트
+- 로컬 저장 (mp4 + txt + thumb)
+- Supabase is_used 업데이트 (영상/오디오 독립 순환, 다 쓰면 자동 리셋)
 """
 
 import os
@@ -14,76 +14,103 @@ import sys
 import tempfile
 import logging
 
-# 프로젝트 루트를 path에 추가
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.file_utils import setup_logging, save_output, cleanup_temp
-from shared.supabase_client import get_unused_item, mark_as_used
-from shared.ffmpeg_utils import loop_video, capture_thumbnail
+from shared.supabase_client import get_unused_item, mark_as_used, reset_used_items
+from shared.ffmpeg_utils import create_rain_video, capture_thumbnail
 from shared.claude_api import generate_title_description
+from shared.thumbnail import add_thumbnail_overlay
 
 logger = logging.getLogger(__name__)
 
-# 테스트 시 60초, 프로덕션 시 10800초 (3시간)
-VIDEO_DURATION = int(os.environ.get("VIDEO_DURATION", "10800"))
-OUTPUT_DIR = os.environ.get("OUTPUT_DIR_RAIN", "/Users/sungho/.n8n-files/비소리채널")
+VIDEO_DURATION  = int(os.environ.get("VIDEO_DURATION", "10800"))   # 전체 길이 (초)
+VISUAL_DURATION = int(os.environ.get("VISUAL_DURATION", "900"))    # Pexels 영상 사용 구간 (초, 기본 15분)
+OUTPUT_DIR      = os.environ.get("OUTPUT_DIR_RAIN", "/Users/sungho/youtube_auto/b4_upload")
+
+
+def _fetch_with_reset(file_type: str) -> dict | None:
+    """미사용 항목 조회 → 없으면 리셋 후 재조회."""
+    item = get_unused_item("generated_files", "file_type", file_type)
+    if not item:
+        logger.info(f"미사용 {file_type} 없음 → 전체 리셋 후 재순환")
+        reset_used_items("generated_files", "file_type", file_type)
+        item = get_unused_item("generated_files", "file_type", file_type)
+    return item
 
 
 def main():
     setup_logging("channel1_rain")
     logger.info("=== 채널 1 (비소리) 실행 시작 ===")
 
-    # 1. Supabase에서 미사용 파일 조회
-    item = get_unused_item("generated_files", "file_type", "rain_video")
-    if not item:
-        logger.warning("사용 가능한 비소리 영상이 없습니다.")
+    # 1. Supabase에서 영상/오디오 각각 조회 (독립 순환)
+    video_item = _fetch_with_reset("rain_video")
+    if not video_item:
+        logger.error("rain_video가 Supabase에 등록되지 않았습니다.")
         return
 
-    source_path = item["file_path"]
-    item_id = item["id"]
-    logger.info(f"소스 영상: {source_path} (id={item_id})")
+    audio_item = _fetch_with_reset("rain_audio")
+    if not audio_item:
+        logger.error("rain_audio가 Supabase에 등록되지 않았습니다.")
+        return
 
-    # 임시 파일 경로
-    tmp_dir = tempfile.mkdtemp(prefix="rain_")
+    visual_path = video_item["file_path"]
+    audio_path  = audio_item["file_path"]
+    logger.info(f"영상 소스: {visual_path} (id={video_item['id']})")
+    logger.info(f"오디오 소스: {audio_path} (id={audio_item['id']})")
+
+    tmp_dir   = tempfile.mkdtemp(prefix="rain_")
     tmp_video = os.path.join(tmp_dir, "output.mp4")
     tmp_thumb = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
-        # 2. FFmpeg 루프 영상 생성
-        logger.info(f"루프 영상 생성 시작 (duration={VIDEO_DURATION}s)")
-        loop_video(source_path, tmp_video, duration=VIDEO_DURATION)
+        # 2. 영상 합성 (앞 15분 Pexels + 나머지 검은 화면 + 빗소리 루프)
+        logger.info(f"영상 합성 시작 (영상={VISUAL_DURATION}s / 전체={VIDEO_DURATION}s)")
+        create_rain_video(visual_path, audio_path, tmp_video, VISUAL_DURATION, VIDEO_DURATION)
 
-        # 3. 썸네일 캡처
+        # 3. 썸네일 캡처 + 오버레이
         capture_thumbnail(tmp_video, tmp_thumb)
+        hours   = VIDEO_DURATION // 3600
+        minutes = (VIDEO_DURATION % 3600) // 60
+        duration_str = f"{hours}시간" if hours > 0 else f"{minutes}분"
+        add_thumbnail_overlay(tmp_thumb, tmp_thumb, channel="rain", top_text=duration_str)
 
         # 4. Claude API로 제목/설명 생성
         logger.info("Claude API로 제목/설명 생성 중...")
         meta = generate_title_description(
-            "비소리 수면 유도 유튜브 영상의 제목과 설명을 한국어로 만들어줘.\n"
-            'JSON 형식으로만 답해줘: {"title": "...", "description": "..."}'
+            f"비소리 수면 유도 유튜브 영상의 제목, 설명, SEO 태그를 한국어로 만들어줘.\n"
+            f"영상 길이는 정확히 {duration_str}이야. 제목에 반드시 '{duration_str}'을 포함해줘.\n"
+            "태그는 검색 최적화를 위해 30개 생성해줘. (예: 빗소리,수면,명상,자연음,수면유도,명상음악,깊은수면,ASMR,백색소음,힐링,...)\n"
+            'JSON 형식으로만 답해줘: {"title": "...", "description": "...", "tags": ["태그1","태그2",...]}'
         )
-        title = meta["title"]
+        title       = meta["title"]
         description = meta["description"]
+        tags        = meta.get("tags", [])
         logger.info(f"생성된 제목: {title}")
 
         # 5. 로컬 저장
+        duration_label = f"{hours}h" if hours > 0 else f"{minutes}min"
+
         result = save_output(
             video_path=tmp_video,
             title=title,
             description=description,
             output_dir=OUTPUT_DIR,
+            channel="rain",
+            duration_label=duration_label,
+            tags=tags,
             thumbnail_path=tmp_thumb,
         )
         logger.info(f"저장 완료: {result}")
 
-        # 6. Supabase 업데이트
-        mark_as_used("generated_files", item_id)
+        # 6. Supabase 업데이트 (영상/오디오 독립)
+        mark_as_used("generated_files", video_item["id"])
+        mark_as_used("generated_files", audio_item["id"])
 
     except Exception as e:
         logger.error(f"채널 1 실행 실패: {e}", exc_info=True)
         raise
     finally:
-        # 7. 임시 파일 정리
         cleanup_temp(tmp_dir)
 
     logger.info("=== 채널 1 (비소리) 실행 완료 ===")

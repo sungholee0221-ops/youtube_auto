@@ -13,6 +13,7 @@ import math
 import tempfile
 from pathlib import Path
 
+import re
 import requests
 from dotenv import load_dotenv
 
@@ -20,6 +21,45 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 BYTE_LIMIT = 5000  # Google TTS 표준 API 1회 바이트 한도
+
+# 채널별 TTS 설정
+_VOICE_CONFIG = {
+    "default": {
+        "name": "ko-KR-Wavenet-C",
+        "ssmlGender": "MALE",
+        "speakingRate": 0.85,
+        "pitch": -2.0,
+    },
+    "history": {
+        "name": "ko-KR-Wavenet-D",   # 더 깊고 차분한 남성 목소리
+        "ssmlGender": "MALE",
+        "speakingRate": 0.80,         # 더 느리게
+        "pitch": -4.0,                # 더 낮은 톤
+    },
+}
+
+
+def _clean_text(text: str) -> str:
+    """TTS 읽어버리는 마크다운/특수기호를 제거한다."""
+    # 마크다운 헤더 (#, ##, ###)
+    text = re.sub(r"^#{1,6}\s*", "", text, flags=re.MULTILINE)
+    # 굵게/이탤릭 (***, **, *)
+    text = re.sub(r"\*{1,3}(.*?)\*{1,3}", r"\1", text)
+    # 밑줄 (__text__)
+    text = re.sub(r"_{1,2}(.*?)_{1,2}", r"\1", text)
+    # 코드 블록 (```)
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+    # 인라인 코드 (`)
+    text = re.sub(r"`(.*?)`", r"\1", text)
+    # 링크 [text](url)
+    text = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)
+    # 수평선 (---, ***)
+    text = re.sub(r"^[-*]{3,}\s*$", "", text, flags=re.MULTILINE)
+    # 남은 단독 특수기호 제거 (줄 앞 >, - 불릿 등)
+    text = re.sub(r"^[>\-\*\+]\s+", "", text, flags=re.MULTILINE)
+    # 연속 공백/빈줄 정리
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
 
 
 def _get_api_key() -> str:
@@ -34,17 +74,20 @@ def _get_api_key() -> str:
         return key
 
 
-def synthesize_speech(text: str, output_path: str) -> str:
+def synthesize_speech(text: str, output_path: str, channel: str = "") -> str:
     """텍스트를 음성으로 변환한다. 5000바이트 초과 시 청크 분할 + 이어붙이기."""
+    text = _clean_text(text)
     text_bytes = len(text.encode("utf-8"))
-    logger.info(f"TTS 입력: {text_bytes} bytes")
+    logger.info(f"TTS 입력: {text_bytes} bytes (channel={channel or 'default'})")
+
+    voice_cfg = _VOICE_CONFIG.get(channel, _VOICE_CONFIG["default"])
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     if text_bytes <= BYTE_LIMIT:
-        _synthesize_chunk(text, output_path)
+        _synthesize_chunk(text, output_path, voice_cfg)
     else:
-        _synthesize_chunked(text, output_path)
+        _synthesize_chunked(text, output_path, voice_cfg)
 
     file_size = os.path.getsize(output_path)
     if file_size == 0:
@@ -53,21 +96,23 @@ def synthesize_speech(text: str, output_path: str) -> str:
     return output_path
 
 
-def _synthesize_chunk(text: str, output_path: str) -> None:
+def _synthesize_chunk(text: str, output_path: str, voice_cfg: dict | None = None) -> None:
     """단일 청크 TTS (5000바이트 이하)."""
+    if voice_cfg is None:
+        voice_cfg = _VOICE_CONFIG["default"]
     api_key = _get_api_key()
     url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={api_key}"
     body = {
         "input": {"text": text},
         "voice": {
             "languageCode": "ko-KR",
-            "name": "ko-KR-Wavenet-C",
-            "ssmlGender": "MALE",
+            "name": voice_cfg["name"],
+            "ssmlGender": voice_cfg["ssmlGender"],
         },
         "audioConfig": {
             "audioEncoding": "MP3",
-            "speakingRate": 0.85,
-            "pitch": -2.0,
+            "speakingRate": voice_cfg["speakingRate"],
+            "pitch": voice_cfg["pitch"],
         },
     }
     resp = requests.post(url, json=body, timeout=120)
@@ -114,8 +159,10 @@ def _split_text(text: str, limit: int = BYTE_LIMIT) -> list[str]:
     return chunks
 
 
-def _synthesize_chunked(text: str, output_path: str) -> None:
+def _synthesize_chunked(text: str, output_path: str, voice_cfg: dict | None = None) -> None:
     """텍스트를 청크로 나눠 TTS 후 MP3를 이어붙인다."""
+    if voice_cfg is None:
+        voice_cfg = _VOICE_CONFIG["default"]
     chunks = _split_text(text)
     logger.info(f"TTS 청크 분할: {len(chunks)}개")
 
@@ -126,7 +173,7 @@ def _synthesize_chunked(text: str, output_path: str) -> None:
         for i, chunk in enumerate(chunks):
             chunk_path = os.path.join(tmp_dir, f"chunk_{i:04d}.mp3")
             logger.info(f"TTS 청크 {i+1}/{len(chunks)} ({len(chunk.encode('utf-8'))} bytes)")
-            _synthesize_chunk(chunk, chunk_path)
+            _synthesize_chunk(chunk, chunk_path, voice_cfg)
             chunk_files.append(chunk_path)
 
         # MP3 파일 단순 이어붙이기 (MP3 프레임 구조상 concat 가능)

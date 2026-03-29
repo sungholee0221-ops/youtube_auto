@@ -21,14 +21,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.file_utils import setup_logging, save_output, cleanup_temp
 from shared.supabase_client import get_next_category, update_category_used
-from shared.claude_api import generate_topic, generate_script, generate_title_description
+from shared.claude_api import generate_topic, generate_long_script, generate_title_description
 from shared.tts import synthesize_speech
 from shared.image_gen import generate_images
-from shared.ffmpeg_utils import images_to_video, mix_audio
+from shared.ffmpeg_utils import create_history_video, capture_thumbnail, mix_audio
+from shared.thumbnail import add_thumbnail_overlay
 
 logger = logging.getLogger(__name__)
 
-OUTPUT_DIR = os.environ.get("OUTPUT_DIR_HISTORY", "/Users/sungho/.n8n-files/역사채널")
+OUTPUT_DIR = os.environ.get("OUTPUT_DIR_HISTORY", "/Users/sungho/youtube_auto/b4_upload")
 BGM_PATH = os.environ.get("BGM_PATH", "")
 IMAGE_COUNT = int(os.environ.get("HISTORY_IMAGE_COUNT", "60"))
 
@@ -52,24 +53,20 @@ def main():
     tmp_img_dir = os.path.join(tmp_dir, "images")
     tmp_video_raw = os.path.join(tmp_dir, "raw.mp4")
     tmp_video = os.path.join(tmp_dir, "output.mp4")
+    tmp_thumb = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
         # 2. Claude API로 주제 선정
         logger.info("주제 선정 중...")
         topic = generate_topic(
             f"'{cat_name}' 카테고리에서 유튜브 역사 다큐 영상으로 적합한 구체적 주제 1개를 선정해줘.\n"
-            "주제명만 한 줄로 답해줘."
-        ).strip()
+            "주제명만 10자 이내 단어/짧은 구로 답해줘. (예: 명량해전, 칭기즈칸, 로마제국 멸망)"
+        ).strip().lstrip("#").strip()
         logger.info(f"선정된 주제: {topic}")
 
-        # 3. Claude API로 2시간 분량 스크립트 생성
-        logger.info("2시간 분량 스크립트 생성 중...")
-        script = generate_script(
-            f"'{topic}'에 대한 2시간 분량 유튜브 역사 다큐 나레이션 스크립트를 한국어로 작성해줘.\n"
-            "수면 유도에 적합한 차분하고 낮은 톤으로 작성.\n"
-            "순수 나레이션 텍스트만 출력해줘.",
-            max_tokens=8192,
-        )
+        # 3. 1시간 분량 스크립트 생성 (6섹션 × 10분)
+        logger.info("1시간 분량 스크립트 생성 중 (6섹션)...")
+        script = generate_long_script(topic, sections=6)
         logger.info(f"스크립트 생성 완료: {len(script)}자")
 
         # 4. 병렬 처리: TTS + 이미지 생성
@@ -81,10 +78,10 @@ def main():
         )
 
         with ThreadPoolExecutor(max_workers=2) as executor:
-            future_tts = executor.submit(synthesize_speech, script, tmp_audio)
+            future_tts = executor.submit(synthesize_speech, script, tmp_audio, "history")
             future_img = executor.submit(
                 generate_images, topic, tmp_img_dir,
-                count=IMAGE_COUNT, style=image_style,
+                count=IMAGE_COUNT, style=image_style, channel="history",
             )
 
             audio_path = future_tts.result()
@@ -93,9 +90,9 @@ def main():
         logger.info(f"TTS 완료: {audio_path}")
         logger.info(f"이미지 {len(image_paths)}장 생성 완료")
 
-        # 5. FFmpeg 이미지+음성 합성
-        logger.info("영상 합성 시작...")
-        images_to_video(image_paths, audio_path, tmp_video_raw, seconds_per_image=10)
+        # 5. FFmpeg 영상 합성 (3분 슬라이드쇼 + 나머지 검은 화면)
+        logger.info("영상 합성 시작 (3분 시각 + 검은 화면)...")
+        create_history_video(image_paths, audio_path, tmp_video_raw, visual_duration=180)
 
         # 6. 배경음악 믹싱
         if BGM_PATH and os.path.exists(BGM_PATH):
@@ -105,27 +102,36 @@ def main():
             logger.warning("배경음악 파일 없음, 음성만 사용")
             tmp_video = tmp_video_raw
 
+        # 6-1. 썸네일 캡처 + 오버레이
+        capture_thumbnail(tmp_video, tmp_thumb)
+        add_thumbnail_overlay(tmp_thumb, tmp_thumb, channel="history", top_text=topic)
+
         # 7. Claude API로 제목/설명 생성
         logger.info("제목/설명 생성 중...")
         meta = generate_title_description(
-            f"'{topic}'에 대한 유튜브 역사 다큐 영상의 제목과 설명을 한국어로 만들어줘.\n"
+            f"'{topic}'에 대한 유튜브 역사 다큐 영상의 제목, 설명, SEO 태그를 한국어로 만들어줘.\n"
             "수면 유도에 적합한 차분한 분위기를 반영해줘.\n"
-            "태그도 5개 포함해줘.\n"
-            'JSON 형식으로만 답해줘: {"title": "...", "description": "...", "tags": [...]}'
+            "태그는 검색 최적화를 위해 30개 생성해줘. (예: 역사,한국사,수면,다큐멘터리,ASMR,세계사,나레이션,수면유도,힐링,문명,전쟁사,...)\n"
+            'JSON 형식으로만 답해줘: {"title": "...", "description": "...", "tags": ["태그1","태그2",...]}'
         )
         title = meta["title"]
         description = meta["description"]
         tags = meta.get("tags", [])
-        if tags:
-            description += "\n\n태그: " + ", ".join(f"#{t}" for t in tags)
         logger.info(f"생성된 제목: {title}")
 
         # 8. 로컬 저장
+        duration_label = "15min"
+
         result = save_output(
             video_path=tmp_video,
             title=title,
             description=description,
             output_dir=OUTPUT_DIR,
+            channel="history",
+            topic=topic,
+            duration_label=duration_label,
+            tags=tags,
+            thumbnail_path=tmp_thumb,
         )
         logger.info(f"저장 완료: {result}")
 

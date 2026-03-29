@@ -93,6 +93,8 @@ def images_to_video(
             "-vcodec", "libx264",
             "-crf", "23",
             "-preset", "fast",
+            "-pix_fmt", "yuv420p",   # QuickTime/iOS 호환
+            "-r", "24",              # 24fps 고정 (이미지 슬라이드쇼)
             "-acodec", "aac",
             "-shortest",
             "-y", output_path,
@@ -101,6 +103,166 @@ def images_to_video(
         os.unlink(list_file.name)
 
     _check_output(output_path, "images_to_video")
+    return output_path
+
+
+def create_rain_video(
+    visual_path: str,
+    audio_path: str,
+    output_path: str,
+    visual_duration: int = 900,
+    total_duration: int = 10800,
+) -> str:
+    """비소리 채널 영상 생성.
+
+    앞 visual_duration초: Pexels 영상 (1920x1080, 무음)
+    나머지: 검은 화면
+    전체 audio_path MP3를 total_duration초 루프하여 합성
+    """
+    import tempfile
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    black_duration = total_duration - visual_duration
+
+    with tempfile.TemporaryDirectory(prefix="rain_build_") as tmp:
+        visual_clip = os.path.join(tmp, "visual.mp4")
+        black_clip   = os.path.join(tmp, "black.mp4")
+        concat_txt   = os.path.join(tmp, "concat.txt")
+        combined     = os.path.join(tmp, "combined.mp4")
+        looped_audio = os.path.join(tmp, "audio.m4a")
+
+        # 1. Pexels 영상 → visual_duration초, 1920x1080, 무음, 끝 5초 페이드아웃
+        fade_duration = 5
+        fade_start = visual_duration - fade_duration
+        _run_ffmpeg([
+            "-stream_loop", "-1", "-i", visual_path,
+            "-t", str(visual_duration),
+            "-vf", (
+                "scale=1920:1080:force_original_aspect_ratio=decrease,"
+                "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,"
+                f"fade=t=out:st={fade_start}:d={fade_duration}"
+            ),
+            "-vcodec", "libx264", "-crf", "23", "-preset", "fast", "-an",
+            "-y", visual_clip,
+        ], desc="rain_visual")
+
+        # 2. 검은 화면 생성 (나머지 시간)
+        _run_ffmpeg([
+            "-f", "lavfi", "-i", f"color=c=black:size=1920x1080:rate=24",
+            "-t", str(black_duration),
+            "-vcodec", "libx264", "-crf", "23", "-preset", "fast", "-an",
+            "-y", black_clip,
+        ], desc="rain_black")
+
+        # 3. 두 영상 이어붙이기
+        with open(concat_txt, "w") as f:
+            f.write(f"file '{visual_clip}'\n")
+            f.write(f"file '{black_clip}'\n")
+        _run_ffmpeg([
+            "-f", "concat", "-safe", "0", "-i", concat_txt,
+            "-c", "copy", "-y", combined,
+        ], desc="rain_concat")
+
+        # 4. 오디오 루프
+        _run_ffmpeg([
+            "-stream_loop", "-1", "-i", audio_path,
+            "-t", str(total_duration),
+            "-acodec", "aac", "-ab", "192k",
+            "-y", looped_audio,
+        ], desc="rain_audio_loop")
+
+        # 5. 영상 + 오디오 합성
+        _run_ffmpeg([
+            "-i", combined, "-i", looped_audio,
+            "-vcodec", "copy", "-acodec", "copy", "-shortest",
+            "-y", output_path,
+        ], desc="rain_merge")
+
+    _check_output(output_path, "create_rain_video")
+    return output_path
+
+
+def create_history_video(
+    image_list: list[str],
+    audio_path: str,
+    output_path: str,
+    visual_duration: int = 180,   # 3분간 이미지 슬라이드쇼
+) -> str:
+    """역사 채널 영상 생성.
+
+    앞 visual_duration초: 이미지 슬라이드쇼
+    나머지: 검은 화면
+    전체: TTS 음성
+    """
+    import tempfile
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+    if not image_list:
+        raise ValueError("이미지 목록이 비어 있습니다.")
+
+    with tempfile.TemporaryDirectory(prefix="history_build_") as tmp:
+        list_file   = os.path.join(tmp, "list.txt")
+        visual_clip = os.path.join(tmp, "visual.mp4")
+        black_clip  = os.path.join(tmp, "black.mp4")
+        concat_txt  = os.path.join(tmp, "concat.txt")
+        combined    = os.path.join(tmp, "combined.mp4")
+
+        # 1. 이미지 슬라이드쇼 → visual_duration초 (이미지 균등 배분)
+        spi = max(1, visual_duration // len(image_list))
+        with open(list_file, "w") as f:
+            for img in image_list:
+                f.write(f"file '{img}'\n")
+                f.write(f"duration {spi}\n")
+            f.write(f"file '{image_list[-1]}'\n")
+
+        _run_ffmpeg([
+            "-f", "concat", "-safe", "0", "-i", list_file,
+            "-vf", (
+                "scale=1920:1080:force_original_aspect_ratio=decrease,"
+                "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,"
+                f"fade=t=out:st={visual_duration - 3}:d=3"
+            ),
+            "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
+            "-pix_fmt", "yuv420p", "-r", "24", "-an",
+            "-t", str(visual_duration),
+            "-y", visual_clip,
+        ], desc="history_visual")
+
+        # 2. 오디오 전체 길이 측정
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", audio_path],
+            capture_output=True, text=True,
+        )
+        total_duration = max(visual_duration + 1, int(float(probe.stdout.strip() or 0)))
+        black_duration = total_duration - visual_duration
+        logger.info(f"오디오 길이: {total_duration}s → 검은화면: {black_duration}s")
+
+        # 3. 검은 화면 (ultrafast + CRF51: 순색이라 품질 손실 없이 빠름)
+        _run_ffmpeg([
+            "-f", "lavfi", "-i", "color=c=black:size=1920x1080:rate=24",
+            "-t", str(black_duration),
+            "-vcodec", "libx264", "-crf", "51", "-preset", "ultrafast",
+            "-tune", "stillimage", "-pix_fmt", "yuv420p", "-an",
+            "-y", black_clip,
+        ], desc="history_black")
+
+        # 4. visual + black 이어붙이기
+        with open(concat_txt, "w") as f:
+            f.write(f"file '{visual_clip}'\n")
+            f.write(f"file '{black_clip}'\n")
+        _run_ffmpeg([
+            "-f", "concat", "-safe", "0", "-i", concat_txt,
+            "-c", "copy", "-y", combined,
+        ], desc="history_concat")
+
+        # 5. 영상 + 음성 합성
+        _run_ffmpeg([
+            "-i", combined, "-i", audio_path,
+            "-vcodec", "copy", "-acodec", "aac", "-ab", "192k",
+            "-shortest", "-y", output_path,
+        ], desc="history_merge")
+
+    _check_output(output_path, "create_history_video")
     return output_path
 
 

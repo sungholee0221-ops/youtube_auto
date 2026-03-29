@@ -59,6 +59,18 @@ def get_next_category(table: str = "history_categories") -> dict | None:
     return None
 
 
+def reset_used_items(table: str, filter_col: str | None = None, filter_val: str | None = None) -> int:
+    """is_used=true인 항목을 전부 false로 리셋한다. 리셋된 건수를 반환한다."""
+    client = get_client()
+    query = client.table(table).update({"is_used": False}).eq("is_used", True)
+    if filter_col and filter_val:
+        query = query.eq(filter_col, filter_val)
+    resp = query.execute()
+    count = len(resp.data) if resp.data else 0
+    logger.info(f"[{table}] is_used 리셋 완료: {count}건")
+    return count
+
+
 def update_category_used(table: str, item_id: int) -> None:
     """카테고리의 last_used_at을 현재 시각으로 업데이트한다."""
     from datetime import datetime, timezone
