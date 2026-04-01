@@ -1,17 +1,21 @@
 """
 채널 3 · 역사이야기 자동화 (소스폴더 기반)
 
-파이프라인:
-1. Supabase weekly_schedule에서 다음 미사용 주차 조회
-2. channel3_source/{folder}/script.json 읽기 → TTS 생성
-3. 씬별 이미지(PNG) + 오프닝 영상 로드
-4. TTS 실제 길이 측정 → 목표 길이(15분)와 비교하여 이미지 표시 시간 계산
-5. FFmpeg: 오프닝(5초) + 이미지 슬라이드쇼 + TTS 합성 (부족분은 무음 패딩)
-6. Claude API로 제목/설명/태그 생성
-7. b4_upload/ 저장 + Supabase 업데이트
+영상 구조:
+  오프닝(원본음성, ~5초)
+  + 이미지 슬라이드쇼(15분, 끝 3초 페이드아웃)
+  + 검은화면(50분)
+  = 총 65분
+
+오디오 구조:
+  오프닝 원본음성
+  + TTS 나레이션 (오프닝 직후 시작)
+  + 무음 패딩 (TTS가 65분 미만이면 채워서 맞춤)
 
 환경변수:
-  HISTORY_TARGET_DURATION  슬라이드쇼 목표 길이(초), 기본 900 (15분)
+  HISTORY_SLIDESHOW_DURATION  슬라이드쇼 길이(초), 기본 900 (15분)
+  HISTORY_BLACK_DURATION      검은화면 길이(초), 기본 3000 (50분)
+  HISTORY_FADEOUT_SEC         슬라이드쇼 끝 페이드아웃(초), 기본 3
 """
 
 import os
@@ -32,15 +36,17 @@ from shared.thumbnail import add_thumbnail_overlay
 
 logger = logging.getLogger(__name__)
 
-SOURCE_DIR      = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "channel3_source")
-OUTPUT_DIR      = os.environ.get("OUTPUT_DIR_HISTORY", "/Users/sungho/youtube_auto/b4_upload")
-TARGET_DURATION = int(os.environ.get("HISTORY_TARGET_DURATION", "900"))  # 15분
+SOURCE_DIR        = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "channel3_source")
+OUTPUT_DIR        = os.environ.get("OUTPUT_DIR_HISTORY", "/Users/sungho/youtube_auto/b4_upload")
+SLIDESHOW_DUR     = int(os.environ.get("HISTORY_SLIDESHOW_DURATION", "900"))   # 15분
+BLACK_DUR         = int(os.environ.get("HISTORY_BLACK_DURATION", "3000"))      # 50분
+FADEOUT_SEC       = int(os.environ.get("HISTORY_FADEOUT_SEC", "3"))
 
 
 def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
-    """JSON 읽기 → (나레이션 텍스트, 이미지 경로 목록, 씬별 나레이션 글자수)
+    """JSON 읽기 → (나레이션, 이미지 경로 목록, 씬별 글자수)
 
-    JSON에 포함된 Perplexity 인용 링크는 load_source_json()이 자동 제거한다.
+    history JSON에는 duration_sec이 없으므로 글자수 비율로 이미지 배분.
     """
     json_files = list(Path(folder_path).glob("*.json"))
     if not json_files:
@@ -52,7 +58,6 @@ def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
     narration   = "\n\n".join(s["narration_kr"] for s in scenes)
     char_counts = [max(1, len(s["narration_kr"])) for s in scenes]
 
-    # 이미지 파일 S번호 순 정렬
     png_files = list(Path(folder_path).glob("*.png"))
 
     def _scene_key(p: Path) -> int:
@@ -60,7 +65,6 @@ def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
         return int(m.group(1)) if m else 999
 
     image_paths = [str(p) for p in sorted(png_files, key=_scene_key)]
-
     return narration, image_paths, char_counts
 
 
@@ -76,17 +80,17 @@ def _compute_durations(char_counts: list[int], n_images: int, total_sec: int) ->
     total_chars = sum(weights) or 1
     durations = [max(1, round(total_sec * w / total_chars)) for w in weights]
 
+    # 반올림 오차 보정
     diff = total_sec - sum(durations)
     durations[-1] = max(1, durations[-1] + diff)
-
     return durations
 
 
 def main():
     setup_logging("channel3_history")
     logger.info("=== 채널 3 (역사이야기) 실행 시작 ===")
+    logger.info(f"구조: 오프닝 + 슬라이드쇼 {SLIDESHOW_DUR}s + 검은화면 {BLACK_DUR}s")
 
-    # 1. Supabase에서 다음 주차 조회
     week = get_next_week("history")
     if not week:
         logger.warning("사용 가능한 주차가 없습니다. (weekly_schedule 테이블 확인)")
@@ -98,7 +102,6 @@ def main():
     week_id     = week["id"]
     logger.info(f"{week_num}주차: {title_kr} (folder={folder_name})")
 
-    # 2. 소스 경로 확인
     folder_path  = os.path.join(SOURCE_DIR, folder_name)
     opening_path = os.path.join(SOURCE_DIR, "history_opening.mp4")
 
@@ -113,7 +116,6 @@ def main():
     tmp_thumb = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
-        # 3. 소스 JSON 로드
         logger.info("소스 JSON 로드 중...")
         narration, image_paths, char_counts = _load_source(folder_path)
         logger.info(f"나레이션: {len(narration)}자, 이미지: {len(image_paths)}장")
@@ -121,20 +123,22 @@ def main():
         if not image_paths:
             raise FileNotFoundError(f"PNG 이미지 없음: {folder_path}")
 
-        # 4. TTS 생성 (history 채널 목소리: Wavenet-D, 느리고 낮은 톤)
+        # TTS 생성 (history: Wavenet-D, 느리고 낮은 톤)
         logger.info("TTS 생성 중...")
         synthesize_speech(narration, tmp_audio, channel="history")
 
-        # 5. TTS 실제 길이 측정 → 목표 길이와 비교
-        tts_dur   = probe_duration(tmp_audio)
-        total_dur = max(round(tts_dur), TARGET_DURATION)
-        logger.info(f"TTS: {tts_dur:.1f}s / 목표: {TARGET_DURATION}s → 슬라이드쇼: {total_dur}s")
+        # TTS 실제 길이 측정
+        tts_dur = probe_duration(tmp_audio)
+        logger.info(f"TTS: {tts_dur:.1f}s / 슬라이드쇼 목표: {SLIDESHOW_DUR}s")
 
-        # 6. 이미지별 표시 시간 계산 (씬 글자수 비율 배분)
-        durations = _compute_durations(char_counts, len(image_paths), total_dur)
+        # 슬라이드쇼 길이 = max(TTS 길이, 목표 15분)
+        # (TTS가 15분보다 길면 슬라이드쇼도 맞춰서 연장)
+        slideshow_dur = max(round(tts_dur), SLIDESHOW_DUR)
+
+        # 이미지 표시 시간: 씬 글자수 비율로 슬라이드쇼 시간 배분
+        durations = _compute_durations(char_counts, len(image_paths), slideshow_dur)
         logger.info(f"이미지 표시 시간(초): {durations}")
 
-        # 7. FFmpeg: 오프닝 + 슬라이드쇼 + TTS (부족분은 무음 패딩)
         logger.info("영상 합성 시작...")
         create_channel_video(
             opening_path=opening_path,
@@ -142,13 +146,13 @@ def main():
             audio_path=tmp_audio,
             output_path=tmp_video,
             image_durations=durations,
+            fadeout_sec=FADEOUT_SEC,
+            black_screen_sec=BLACK_DUR,
         )
 
-        # 8. 썸네일
         capture_thumbnail(tmp_video, tmp_thumb)
         add_thumbnail_overlay(tmp_thumb, tmp_thumb, channel="history", top_text=title_kr)
 
-        # 9. Claude: 제목/설명/태그
         logger.info("제목/설명 생성 중...")
         meta = generate_title_description(
             f"'{title_kr}'에 대한 유튜브 역사 다큐 영상의 제목, 설명, SEO 태그를 한국어로 만들어줘.\n"
@@ -161,7 +165,7 @@ def main():
         tags        = meta.get("tags", [])
         logger.info(f"생성된 제목: {title}")
 
-        # 10. 저장
+        total_dur      = slideshow_dur + BLACK_DUR
         duration_label = f"{max(1, total_dur // 60)}min"
         result = save_output(
             video_path=tmp_video,
@@ -176,7 +180,6 @@ def main():
         )
         logger.info(f"저장 완료: {result}")
 
-        # 11. Supabase 주차 업데이트
         mark_week_used(week_id)
 
     except Exception as e:

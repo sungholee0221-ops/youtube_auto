@@ -1,23 +1,20 @@
 """
 채널 2 · 공룡이야기 자동화 (소스폴더 기반)
 
-파이프라인:
-1. Supabase weekly_schedule에서 다음 미사용 주차 조회
-2. channel2_source/{folder}/script.json 읽기 → TTS 생성
-3. 씬별 이미지(PNG) + 오프닝 영상 로드
-4. TTS 실제 길이 측정 → 목표 길이(10분)와 비교하여 이미지 표시 시간 계산
-5. FFmpeg: 오프닝(5초) + 이미지 슬라이드쇼 + TTS 합성 (부족분은 무음 패딩)
-6. Claude API로 제목/설명/태그 생성
-7. b4_upload/ 저장 + Supabase 업데이트
+영상 구조: 오프닝(원본음성) + 이미지 슬라이드쇼 + TTS
+- 이미지 표시 시간은 JSON의 duration_sec을 그대로 사용 (씬 싱크 보장)
+- TTS가 씬 합계보다 길면 마지막 이미지 표시 시간을 자동 연장
+- TTS가 짧으면 해당 씬 이미지가 더 오래 표시됨 (자연스러운 여백)
+- 목표 길이: 10분 (JSON 스크립트 기준 1300~1500자 권장)
 
 환경변수:
-  DINO_TARGET_DURATION  슬라이드쇼 목표 길이(초), 기본 600 (10분)
+  DINO_TARGET_DURATION  슬라이드쇼 최소 길이(초), 기본 600 (10분)
 """
 
 import os
 import re
 import sys
-import json
+import math
 import tempfile
 import logging
 from pathlib import Path
@@ -39,7 +36,7 @@ TARGET_DURATION = int(os.environ.get("DINO_TARGET_DURATION", "600"))   # 10분
 
 
 def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
-    """JSON 읽기 → (나레이션 텍스트, 이미지 경로 목록, 씬별 나레이션 글자수)"""
+    """JSON 읽기 → (나레이션, 이미지 경로 목록, 씬별 duration_sec)"""
     json_files = list(Path(folder_path).glob("*.json"))
     if not json_files:
         raise FileNotFoundError(f"JSON 파일 없음: {folder_path}")
@@ -47,10 +44,10 @@ def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
     data   = load_source_json(str(json_files[0]))
     scenes = data["scenes"]
 
-    narration  = "\n\n".join(s["narration_kr"] for s in scenes)
-    char_counts = [max(1, len(s["narration_kr"])) for s in scenes]
+    narration = "\n\n".join(s["narration_kr"] for s in scenes)
+    # JSON에 명시된 duration_sec 사용 (씬 싱크 기준값)
+    durations = [int(s.get("duration_sec", 10)) for s in scenes]
 
-    # 이미지 파일 S번호 순 정렬
     png_files = list(Path(folder_path).glob("*.png"))
 
     def _scene_key(p: Path) -> int:
@@ -58,38 +55,13 @@ def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
         return int(m.group(1)) if m else 999
 
     image_paths = [str(p) for p in sorted(png_files, key=_scene_key)]
-
-    return narration, image_paths, char_counts
-
-
-def _compute_durations(char_counts: list[int], n_images: int, total_sec: int) -> list[int]:
-    """씬별 글자수 비율로 이미지 표시 시간(초)을 계산한다.
-    이미지 수가 씬 수보다 적으면 나머지 글자수를 마지막 이미지에 합산한다.
-    """
-    if n_images >= len(char_counts):
-        # 이미지가 씬보다 많거나 같으면 균등 분배
-        weights = char_counts + [0] * (n_images - len(char_counts))
-    else:
-        # 이미지가 씬보다 적으면: 나머지 씬 글자수를 마지막 이미지에 누적
-        weights = list(char_counts[:n_images])
-        for c in char_counts[n_images:]:
-            weights[-1] += c
-
-    total_chars = sum(weights) or 1
-    durations = [max(1, round(total_sec * w / total_chars)) for w in weights]
-
-    # 반올림 오차 보정: 마지막 이미지에서 조정
-    diff = total_sec - sum(durations)
-    durations[-1] = max(1, durations[-1] + diff)
-
-    return durations
+    return narration, image_paths, durations
 
 
 def main():
     setup_logging("channel2_dino")
     logger.info("=== 채널 2 (공룡이야기) 실행 시작 ===")
 
-    # 1. Supabase에서 다음 주차 조회
     week = get_next_week("dino")
     if not week:
         logger.warning("사용 가능한 주차가 없습니다. (weekly_schedule 테이블 확인)")
@@ -101,7 +73,6 @@ def main():
     week_id     = week["id"]
     logger.info(f"{week_num}주차: {title_kr} (folder={folder_name})")
 
-    # 2. 소스 경로 확인
     folder_path  = os.path.join(SOURCE_DIR, folder_name)
     opening_path = os.path.join(SOURCE_DIR, "dino_opening.mp4")
 
@@ -116,28 +87,49 @@ def main():
     tmp_thumb = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
-        # 3. 소스 JSON 로드
         logger.info("소스 JSON 로드 중...")
-        narration, image_paths, char_counts = _load_source(folder_path)
-        logger.info(f"나레이션: {len(narration)}자, 이미지: {len(image_paths)}장")
+        narration, image_paths, durations = _load_source(folder_path)
+        logger.info(f"나레이션: {len(narration)}자, 이미지: {len(image_paths)}장, "
+                    f"씬 duration 합: {sum(durations)}s")
 
         if not image_paths:
             raise FileNotFoundError(f"PNG 이미지 없음: {folder_path}")
 
-        # 4. TTS 생성
+        # 이미지 수와 씬 수가 다를 때 durations 맞춤
+        n = len(image_paths)
+        if len(durations) > n:
+            # 씬이 이미지보다 많으면 초과 duration을 마지막 이미지에 누적
+            durations = durations[:n]
+            for extra in durations[n:]:
+                durations[-1] += extra
+        elif len(durations) < n:
+            # 이미지가 씬보다 많으면 부족분을 기본값 10으로 채움
+            durations += [10] * (n - len(durations))
+
         logger.info("TTS 생성 중...")
         synthesize_speech(narration, tmp_audio, channel="dino")
 
-        # 5. TTS 실제 길이 측정 → 목표 길이와 비교
-        tts_dur    = probe_duration(tmp_audio)
-        total_dur  = max(round(tts_dur), TARGET_DURATION)
-        logger.info(f"TTS: {tts_dur:.1f}s / 목표: {TARGET_DURATION}s → 슬라이드쇼: {total_dur}s")
+        # TTS 실제 길이 측정
+        tts_dur = probe_duration(tmp_audio)
+        sum_dur = sum(durations)
+        logger.info(f"TTS: {tts_dur:.1f}s / 씬 합계: {sum_dur}s / 목표: {TARGET_DURATION}s")
 
-        # 6. 이미지별 표시 시간 계산 (씬 글자수 비율 배분)
-        durations = _compute_durations(char_counts, len(image_paths), total_dur)
-        logger.info(f"이미지 표시 시간(초): {durations}")
+        # TTS가 씬 합계보다 길면 마지막 이미지 연장
+        if tts_dur > sum_dur:
+            extra = math.ceil(tts_dur - sum_dur) + 2   # 여유 2초
+            durations[-1] += extra
+            logger.info(f"마지막 씬 +{extra}s 연장 → 새 합계: {sum(durations)}s")
 
-        # 7. FFmpeg: 오프닝 + 슬라이드쇼 + TTS (부족분은 무음 패딩)
+        # 목표 길이 미달이면 마지막 이미지 추가 연장
+        total_dur = sum(durations)
+        if total_dur < TARGET_DURATION:
+            pad = TARGET_DURATION - total_dur
+            durations[-1] += pad
+            logger.info(f"목표 미달로 마지막 씬 +{pad}s 추가 연장 → {sum(durations)}s")
+
+        total_dur = sum(durations)
+        logger.info(f"최종 슬라이드쇼 길이: {total_dur}s, 이미지 표시 시간: {durations}")
+
         logger.info("영상 합성 시작...")
         create_channel_video(
             opening_path=opening_path,
@@ -145,13 +137,13 @@ def main():
             audio_path=tmp_audio,
             output_path=tmp_video,
             image_durations=durations,
+            fadeout_sec=0,
+            black_screen_sec=0,
         )
 
-        # 8. 썸네일
         capture_thumbnail(tmp_video, tmp_thumb)
         add_thumbnail_overlay(tmp_thumb, tmp_thumb, channel="dino", top_text=title_kr)
 
-        # 9. Claude: 제목/설명/태그
         logger.info("제목/설명 생성 중...")
         meta = generate_title_description(
             f"'{title_kr}'에 대한 유튜브 공룡 다큐멘터리 영상의 제목, 설명, SEO 태그를 한국어로 만들어줘.\n"
@@ -164,7 +156,6 @@ def main():
         tags        = meta.get("tags", [])
         logger.info(f"생성된 제목: {title}")
 
-        # 10. 저장
         duration_label = f"{max(1, total_dur // 60)}min"
         result = save_output(
             video_path=tmp_video,
@@ -179,7 +170,6 @@ def main():
         )
         logger.info(f"저장 완료: {result}")
 
-        # 11. Supabase 주차 업데이트
         mark_week_used(week_id)
 
     except Exception as e:

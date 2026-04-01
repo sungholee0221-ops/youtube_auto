@@ -30,10 +30,16 @@ _VOICE_CONFIG = {
         "speakingRate": 0.85,
         "pitch": -2.0,
     },
+    "dino": {
+        "name": "ko-KR-Wavenet-C",
+        "ssmlGender": "MALE",
+        "speakingRate": 0.78,   # 느리게 — 씬별 duration_sec에 맞게 여유 있게 읽기
+        "pitch": -2.0,
+    },
     "history": {
         "name": "ko-KR-Wavenet-D",   # 더 깊고 차분한 남성 목소리
         "ssmlGender": "MALE",
-        "speakingRate": 0.80,         # 더 느리게
+        "speakingRate": 0.78,         # 더 느리게 (0.80 → 0.78)
         "pitch": -4.0,                # 더 낮은 톤
     },
 }

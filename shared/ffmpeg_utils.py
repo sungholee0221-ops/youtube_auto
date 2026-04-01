@@ -285,11 +285,16 @@ def create_channel_video(
     audio_path: str,
     output_path: str,
     image_durations: list[int],
+    fadeout_sec: int = 0,
+    black_screen_sec: int = 0,
 ) -> str:
-    """오프닝(mp4) + 이미지 슬라이드쇼 + TTS 음성을 합성한다.
+    """채널 공통 영상 합성.
 
-    image_durations: 이미지별 표시 시간(초). 합산값이 슬라이드쇼 총 길이.
-    TTS 오디오가 슬라이드쇼보다 짧으면 자동으로 무음 패딩하여 총 길이를 맞춘다.
+    구조: 오프닝 + 이미지 슬라이드쇼 [+ 검은화면]
+    오디오: 오프닝 원본 음성 → TTS (오프닝 끝난 뒤부터 시작)
+
+    fadeout_sec    : 슬라이드쇼 끝 페이드아웃 초 (0=없음, 채널3=3)
+    black_screen_sec: 슬라이드쇼 뒤 검은화면 초 (0=없음, 채널3=3000)
     """
     import tempfile
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -297,40 +302,62 @@ def create_channel_video(
     if not image_list:
         raise ValueError("이미지 목록이 비어 있습니다.")
     if len(image_durations) != len(image_list):
-        raise ValueError(f"image_durations 길이({len(image_durations)}) ≠ image_list({len(image_list)})")
+        raise ValueError(f"image_durations({len(image_durations)}) ≠ image_list({len(image_list)})")
 
-    slideshow_dur = sum(image_durations)
+    slideshow_dur      = sum(image_durations)
+    total_content_dur  = slideshow_dur + black_screen_sec  # 오프닝 이후 전체 길이
 
     with tempfile.TemporaryDirectory(prefix="channel_build_") as tmp:
-        opening_clip  = os.path.join(tmp, "opening.mp4")
-        padded_audio  = os.path.join(tmp, "audio_padded.m4a")
-        slideshow     = os.path.join(tmp, "slideshow.mp4")
-        combined      = os.path.join(tmp, "combined.mp4")
-        concat_txt    = os.path.join(tmp, "concat.txt")
-        list_file     = os.path.join(tmp, "images.txt")
+        opening_v    = os.path.join(tmp, "opening_v.mp4")   # 오프닝 영상 트랙
+        opening_a    = os.path.join(tmp, "opening_a.m4a")   # 오프닝 오디오 트랙
+        padded_tts   = os.path.join(tmp, "tts_padded.m4a")  # TTS + 무음 패딩
+        full_audio   = os.path.join(tmp, "full_audio.m4a")  # 오프닝오디오 + TTS
+        slideshow    = os.path.join(tmp, "slideshow.mp4")
+        black_clip   = os.path.join(tmp, "black.mp4")
+        combined_v   = os.path.join(tmp, "combined_v.mp4")
+        concat_v_txt = os.path.join(tmp, "concat_v.txt")
+        list_file    = os.path.join(tmp, "images.txt")
 
-        # 1. 오프닝 → 1920x1080, 24fps, yuv420p, 무음
+        # 1. 오프닝 → 영상 트랙 (1920x1080, 24fps, yuv420p)
         _run_ffmpeg([
             "-i", opening_path,
-            "-vf", (
-                "scale=1920:1080:force_original_aspect_ratio=decrease,"
-                "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24"
-            ),
+            "-vf", ("scale=1920:1080:force_original_aspect_ratio=decrease,"
+                    "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24"),
             "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
-            "-pix_fmt", "yuv420p", "-an",
-            "-y", opening_clip,
-        ], desc="opening_clip")
+            "-pix_fmt", "yuv420p", "-an", "-y", opening_v,
+        ], desc="opening_video")
 
-        # 2. TTS 오디오 → 슬라이드쇼 총 길이에 맞게 무음 패딩
-        #    (TTS가 더 길면 그대로 사용, 짧으면 뒤에 무음 추가)
+        # 2. 오프닝 → 오디오 트랙 추출 (원본 음성 보존)
+        _run_ffmpeg([
+            "-i", opening_path,
+            "-vn", "-acodec", "aac", "-ab", "192k",
+            "-y", opening_a,
+        ], desc="opening_audio")
+
+        # 3. TTS → 슬라이드쇼+검은화면 총 길이로 무음 패딩
         _run_ffmpeg([
             "-i", audio_path,
-            "-af", f"apad=whole_dur={slideshow_dur}",
+            "-af", f"apad=whole_dur={total_content_dur}",
             "-acodec", "aac", "-ab", "192k",
-            "-y", padded_audio,
-        ], desc="pad_audio")
+            "-y", padded_tts,
+        ], desc="pad_tts")
 
-        # 3. 이미지 슬라이드쇼 (이미지별 duration)
+        # 4. 전체 오디오 = 오프닝 오디오 + 패딩된 TTS (순차 이어붙이기)
+        _run_ffmpeg([
+            "-i", opening_a, "-i", padded_tts,
+            "-filter_complex", "[0:a][1:a]concat=n=2:v=0:a=1[out]",
+            "-map", "[out]",
+            "-acodec", "aac", "-ab", "192k",
+            "-y", full_audio,
+        ], desc="concat_audio")
+
+        # 5. 이미지 슬라이드쇼 (이미지별 duration, 선택 페이드아웃)
+        vf = ("scale=1920:1080:force_original_aspect_ratio=decrease,"
+              "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24")
+        if fadeout_sec > 0:
+            fade_st = max(0, slideshow_dur - fadeout_sec)
+            vf += f",fade=t=out:st={fade_st}:d={fadeout_sec}"
+
         with open(list_file, "w") as f:
             for img, dur in zip(image_list, image_durations):
                 f.write(f"file '{img}'\n")
@@ -339,31 +366,40 @@ def create_channel_video(
 
         _run_ffmpeg([
             "-f", "concat", "-safe", "0", "-i", list_file,
-            "-vf", (
-                "scale=1920:1080:force_original_aspect_ratio=decrease,"
-                "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24"
-            ),
+            "-vf", vf,
             "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
             "-pix_fmt", "yuv420p", "-r", "24", "-an",
+            "-t", str(slideshow_dur),
             "-y", slideshow,
         ], desc="slideshow")
 
-        # 4. 오프닝 + 슬라이드쇼 이어붙이기
-        with open(concat_txt, "w") as f:
-            f.write(f"file '{opening_clip}'\n")
-            f.write(f"file '{slideshow}'\n")
+        # 6. 검은화면 (채널3용)
+        clips = [opening_v, slideshow]
+        if black_screen_sec > 0:
+            _run_ffmpeg([
+                "-f", "lavfi", "-i", "color=c=black:size=1920x1080:rate=24",
+                "-t", str(black_screen_sec),
+                "-vcodec", "libx264", "-crf", "51", "-preset", "ultrafast",
+                "-tune", "stillimage", "-pix_fmt", "yuv420p", "-an",
+                "-y", black_clip,
+            ], desc="black_screen")
+            clips.append(black_clip)
 
+        # 7. 영상 트랙 이어붙이기
+        with open(concat_v_txt, "w") as f:
+            for c in clips:
+                f.write(f"file '{c}'\n")
         _run_ffmpeg([
-            "-f", "concat", "-safe", "0", "-i", concat_txt,
-            "-c", "copy", "-y", combined,
-        ], desc="concat_opening_slideshow")
+            "-f", "concat", "-safe", "0", "-i", concat_v_txt,
+            "-c", "copy", "-y", combined_v,
+        ], desc="concat_video")
 
-        # 5. 영상 + 패딩된 오디오 합성
+        # 8. 영상 + 전체 오디오 합성
         _run_ffmpeg([
-            "-i", combined, "-i", padded_audio,
+            "-i", combined_v, "-i", full_audio,
             "-vcodec", "copy", "-acodec", "copy",
             "-shortest", "-y", output_path,
-        ], desc="mux_audio")
+        ], desc="mux_final")
 
     _check_output(output_path, "create_channel_video")
     return output_path
