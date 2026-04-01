@@ -1,4 +1,6 @@
 import os
+import re
+import json
 import glob
 import shutil
 import logging
@@ -6,6 +8,33 @@ from pathlib import Path
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
+
+def load_source_json(file_path: str) -> dict:
+    """소스 JSON 파일을 전처리 후 안전하게 파싱한다.
+
+    처리 항목:
+    1. 마크다운 코드블록 제거  (```json ... ```)
+    2. Perplexity 인용 링크 제거  (, [ppl-ai-...](url))
+    3. 후행 쉼표 제거  (trailing commas — JSON 비표준)
+    """
+    with open(file_path, "r", encoding="utf-8") as f:
+        raw = f.read()
+
+    # 1. 마크다운 코드블록
+    raw = re.sub(r"^```(?:json)?\s*\n?", "", raw.strip())
+    raw = re.sub(r"\n?```\s*$", "", raw.strip())
+
+    # 2. Perplexity 인용 링크 (, [ppl-ai-...](url) 또는 공백만 앞에 오는 경우)
+    raw = re.sub(r"(,?)\s*\[ppl-ai-file-upload[^\]]*\]\([^\)]+\)", r"\1", raw)
+
+    # 3. 후행 쉼표
+    raw = re.sub(r",\s*([}\]])", r"\1", raw)
+
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"JSON 파싱 실패 ({file_path}): {e}\n--- 전처리 후 앞부분 ---\n{raw[:300]}") from e
 
 
 # 채널별 AI 공개 문구 (설명란 삽입용, 간결하게)

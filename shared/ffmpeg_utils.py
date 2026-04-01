@@ -20,6 +20,16 @@ def _run_ffmpeg(args: list[str], desc: str = "") -> None:
         raise RuntimeError(f"FFmpeg 실패 ({desc}): {result.stderr[:500]}")
 
 
+def probe_duration(path: str) -> float:
+    """FFprobe로 파일 재생 시간(초)을 반환한다."""
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", path],
+        capture_output=True, text=True,
+    )
+    return float(result.stdout.strip() or "0")
+
+
 def _check_output(path: str, desc: str = "") -> None:
     """출력 파일이 0바이트인지 검사한다."""
     if not os.path.exists(path):
@@ -274,36 +284,30 @@ def create_channel_video(
     image_list: list[str],
     audio_path: str,
     output_path: str,
-    image_durations: list[int] | None = None,
-    default_sec: int = 10,
+    image_durations: list[int],
 ) -> str:
     """오프닝(mp4) + 이미지 슬라이드쇼 + TTS 음성을 합성한다.
 
-    image_durations: 씬별 초. None이면 오디오 길이를 이미지 수로 균등 분배.
+    image_durations: 이미지별 표시 시간(초). 합산값이 슬라이드쇼 총 길이.
+    TTS 오디오가 슬라이드쇼보다 짧으면 자동으로 무음 패딩하여 총 길이를 맞춘다.
     """
     import tempfile
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     if not image_list:
         raise ValueError("이미지 목록이 비어 있습니다.")
+    if len(image_durations) != len(image_list):
+        raise ValueError(f"image_durations 길이({len(image_durations)}) ≠ image_list({len(image_list)})")
 
-    # 이미지 durations 결정
-    if image_durations is None:
-        probe = subprocess.run(
-            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-             "-of", "default=noprint_wrappers=1:nokey=1", audio_path],
-            capture_output=True, text=True,
-        )
-        audio_dur = float(probe.stdout.strip() or "0") or (len(image_list) * default_sec)
-        sec_each = max(default_sec, int(audio_dur / len(image_list)))
-        image_durations = [sec_each] * len(image_list)
+    slideshow_dur = sum(image_durations)
 
     with tempfile.TemporaryDirectory(prefix="channel_build_") as tmp:
-        opening_clip = os.path.join(tmp, "opening.mp4")
-        slideshow    = os.path.join(tmp, "slideshow.mp4")
-        combined     = os.path.join(tmp, "combined.mp4")
-        concat_txt   = os.path.join(tmp, "concat.txt")
-        list_file    = os.path.join(tmp, "images.txt")
+        opening_clip  = os.path.join(tmp, "opening.mp4")
+        padded_audio  = os.path.join(tmp, "audio_padded.m4a")
+        slideshow     = os.path.join(tmp, "slideshow.mp4")
+        combined      = os.path.join(tmp, "combined.mp4")
+        concat_txt    = os.path.join(tmp, "concat.txt")
+        list_file     = os.path.join(tmp, "images.txt")
 
         # 1. 오프닝 → 1920x1080, 24fps, yuv420p, 무음
         _run_ffmpeg([
@@ -317,7 +321,16 @@ def create_channel_video(
             "-y", opening_clip,
         ], desc="opening_clip")
 
-        # 2. 이미지 슬라이드쇼 (씬별 duration)
+        # 2. TTS 오디오 → 슬라이드쇼 총 길이에 맞게 무음 패딩
+        #    (TTS가 더 길면 그대로 사용, 짧으면 뒤에 무음 추가)
+        _run_ffmpeg([
+            "-i", audio_path,
+            "-af", f"apad=whole_dur={slideshow_dur}",
+            "-acodec", "aac", "-ab", "192k",
+            "-y", padded_audio,
+        ], desc="pad_audio")
+
+        # 3. 이미지 슬라이드쇼 (이미지별 duration)
         with open(list_file, "w") as f:
             for img, dur in zip(image_list, image_durations):
                 f.write(f"file '{img}'\n")
@@ -335,7 +348,7 @@ def create_channel_video(
             "-y", slideshow,
         ], desc="slideshow")
 
-        # 3. 오프닝 + 슬라이드쇼 이어붙이기
+        # 4. 오프닝 + 슬라이드쇼 이어붙이기
         with open(concat_txt, "w") as f:
             f.write(f"file '{opening_clip}'\n")
             f.write(f"file '{slideshow}'\n")
@@ -345,10 +358,10 @@ def create_channel_video(
             "-c", "copy", "-y", combined,
         ], desc="concat_opening_slideshow")
 
-        # 4. 영상 + TTS 음성 합성
+        # 5. 영상 + 패딩된 오디오 합성
         _run_ffmpeg([
-            "-i", combined, "-i", audio_path,
-            "-vcodec", "copy", "-acodec", "aac", "-ab", "192k",
+            "-i", combined, "-i", padded_audio,
+            "-vcodec", "copy", "-acodec", "copy",
             "-shortest", "-y", output_path,
         ], desc="mux_audio")
 
