@@ -14,7 +14,6 @@
 import os
 import re
 import sys
-import math
 import tempfile
 import logging
 from pathlib import Path
@@ -36,7 +35,11 @@ TARGET_DURATION = int(os.environ.get("DINO_TARGET_DURATION", "600"))   # 10분
 
 
 def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
-    """JSON 읽기 → (나레이션, 이미지 경로 목록, 씬별 duration_sec)"""
+    """JSON 읽기 → (나레이션, 이미지 경로 목록, 씬별 글자수)
+
+    duration_sec은 에이전트가 임의 설정한 값이라 실제 TTS 속도와 맞지 않음.
+    대신 씬별 narration_kr 글자수를 반환 → 실제 TTS 길이에 비례해 배분.
+    """
     json_files = list(Path(folder_path).glob("*.json"))
     if not json_files:
         raise FileNotFoundError(f"JSON 파일 없음: {folder_path}")
@@ -44,9 +47,8 @@ def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
     data   = load_source_json(str(json_files[0]))
     scenes = data["scenes"]
 
-    narration = "\n\n".join(s["narration_kr"] for s in scenes)
-    # JSON에 명시된 duration_sec 사용 (씬 싱크 기준값)
-    durations = [int(s.get("duration_sec", 10)) for s in scenes]
+    narration   = "\n\n".join(s["narration_kr"] for s in scenes)
+    char_counts = [max(1, len(s["narration_kr"])) for s in scenes]
 
     png_files = list(Path(folder_path).glob("*.png"))
 
@@ -55,7 +57,23 @@ def _load_source(folder_path: str) -> tuple[str, list[str], list[int]]:
         return int(m.group(1)) if m else 999
 
     image_paths = [str(p) for p in sorted(png_files, key=_scene_key)]
-    return narration, image_paths, durations
+    return narration, image_paths, char_counts
+
+
+def _compute_durations(char_counts: list[int], n_images: int, total_sec: int) -> list[int]:
+    """씬별 글자수 비율로 이미지 표시 시간(초)을 계산한다."""
+    if n_images >= len(char_counts):
+        weights = char_counts + [0] * (n_images - len(char_counts))
+    else:
+        weights = list(char_counts[:n_images])
+        for c in char_counts[n_images:]:
+            weights[-1] += c
+
+    total_chars = sum(weights) or 1
+    durations = [max(1, round(total_sec * w / total_chars)) for w in weights]
+    diff = total_sec - sum(durations)
+    durations[-1] = max(1, durations[-1] + diff)
+    return durations
 
 
 def main():
@@ -95,37 +113,16 @@ def main():
         if not image_paths:
             raise FileNotFoundError(f"PNG 이미지 없음: {folder_path}")
 
-        # 이미지 수와 씬 수가 다를 때 durations 맞춤
-        n = len(image_paths)
-        if len(durations) > n:
-            # 씬이 이미지보다 많으면 초과 duration을 마지막 이미지에 누적
-            durations = durations[:n]
-            for extra in durations[n:]:
-                durations[-1] += extra
-        elif len(durations) < n:
-            # 이미지가 씬보다 많으면 부족분을 기본값 10으로 채움
-            durations += [10] * (n - len(durations))
-
         logger.info("TTS 생성 중...")
         synthesize_speech(narration, tmp_audio, channel="dino")
 
-        # TTS 실제 길이 측정
-        tts_dur = probe_duration(tmp_audio)
-        sum_dur = sum(durations)
-        logger.info(f"TTS: {tts_dur:.1f}s / 씬 합계: {sum_dur}s / 목표: {TARGET_DURATION}s")
+        # TTS 실제 길이 측정 → 목표 길이와 비교
+        tts_dur   = probe_duration(tmp_audio)
+        total_dur = max(round(tts_dur), TARGET_DURATION)
+        logger.info(f"TTS: {tts_dur:.1f}s / 목표: {TARGET_DURATION}s → 슬라이드쇼: {total_dur}s")
 
-        # TTS가 씬 합계보다 길면 마지막 이미지 연장
-        if tts_dur > sum_dur:
-            extra = math.ceil(tts_dur - sum_dur) + 2   # 여유 2초
-            durations[-1] += extra
-            logger.info(f"마지막 씬 +{extra}s 연장 → 새 합계: {sum(durations)}s")
-
-        # 목표 길이 미달이면 마지막 이미지 추가 연장
-        total_dur = sum(durations)
-        if total_dur < TARGET_DURATION:
-            pad = TARGET_DURATION - total_dur
-            durations[-1] += pad
-            logger.info(f"목표 미달로 마지막 씬 +{pad}s 추가 연장 → {sum(durations)}s")
+        # 씬 글자수 비율로 이미지 표시 시간 배분 (실제 TTS 속도 기반 싱크)
+        durations = _compute_durations(char_counts, len(image_paths), total_dur)
 
         total_dur = sum(durations)
         logger.info(f"최종 슬라이드쇼 길이: {total_dur}s, 이미지 표시 시간: {durations}")
