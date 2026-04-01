@@ -1,0 +1,63 @@
+{
+  "week": 1,
+  "title_kr": "티라노사우루스 렉스",
+  "title_en": "Tyrannosaurus rex",
+  "period": "후기 백악기 (약 6,800만~6,600만 년 전)",
+  "hook": "지구 역사상 가장 강력한 턱을 가진 포식자 — 그 이름만으로도 대지가 떨린다.",
+  "scenes": [
+    {
+      "scene_id": "S01",
+      "duration_sec": 20,
+      "narration_kr": "6,800만 년 전, 지금의 북아메리카 대륙. 빽빽한 침엽수림 사이로, 어마어마한 발소리가 땅을 진동시킵니다. 티라노사우루스 렉스가 걸어옵니다. 몸길이 12미터, 몸무게 약 9톤. '폭군 도마뱀의 왕'이라는 이름에 걸맞게, 이 생명체는 자신의 시대를 완전히 지배했습니다.",
+      "visual_description": "울창한 후기 백악기 침엽수림. 안개가 낮게 깔린 이른 아침. 거대한 발자국이 진흙에 찍히며 성체 티렉스가 화면 앞으로 천천히 걸어 들어온다. 카메라는 로우앵글에서 서서히 위로 틸트업.",
+      "image_prompt_en": "Photorealistic adult Tyrannosaurus rex walking through a misty Late Cretaceous conifer forest at dawn, low angle shot tilting upward, warm morning light filtering through ancient trees, muddy ground with massive footprints, paleontologically accurate scaled skin with subtle feather traces on dorsal spine, BBC Prehistoric Planet style, 8K cinematic, no cartoonish features",
+      "keywords": ["티라노사우루스", "후기 백악기", "북아메리카", "침엽수림"]
+    },
+    {
+      "scene_id": "S02",
+      "duration_sec": 25,
+      "narration_kr": "성체 티렉스의 몸에 깃털이 있었을까요? 최신 연구에 따르면, 성체의 피부 화석에서는 비늘 흔적이 발견되었습니다. 그러나 어릴 때는 보온을 위해 솜털 같은 원시 깃털로 덮여 있었을 가능성이 높습니다. 마치 코끼리나 코뿔소처럼, 몸집이 커지면서 단열 필요성이 줄어들어 깃털을 잃어갔을 것으로 추정됩니다.",
+      "visual_description": "성체 티렉스의 피부 클로즈업. 비늘 질감이 선명하게 보이고, 등 쪽 척추를 따라 가는 털 같은 구조가 희미하게 남아있다. 이어 어린 티렉스 새끼가 등장, 몸 전체에 갈색 솜털이 덮여있는 모습.",
+      "image_prompt_en": "Close-up photorealistic skin texture of Tyrannosaurus rex showing mosaic scales with subtle proto-feather filaments along dorsal spine, then cut to juvenile T. rex covered in brown downy proto-feathers, BBC Prehistoric Planet style, paleontologically accurate, 8K macro detail, no cartoonish features",
+      "keywords": ["깃털", "피부 화석", "비늘", "유체 변화"]
+    },
+    {
+      "scene_id": "S03",
+      "duration_sec": 30,
+      "narration_kr": "티렉스의 진짜 무기는 그 턱입니다. 최대 5만 7천 뉴턴 — 지구상 육상동물 중 가장 강력한 교합력으로 추정됩니다. 이 힘은 뼈를 쉽게 부수고 골수까지 빨아먹을 수 있는 수준입니다. 코뿔소의 뿔을 쥐어 부수는 것과 맞먹는 힘이죠. 50개가 넘는 바나나 크기 이빨 하나하나가 뼈를 관통하도록 설계되어 있었습니다.",
+      "visual_description": "티렉스가 에드몬토사우루스 사체를 물어뜯는 장면. 강력한 턱이 닫히며 뼈가 부서지는 순간을 슬로모션으로. 이빨의 단면 인포그래픽이 짧게 삽입됨.",
+      "image_prompt_en": "Photorealistic Tyrannosaurus rex crushing bones of Edmontosaurus carcass, powerful jaw close-up in slow motion, massive banana-sized serrated teeth visible, blood and bone fragments, dense Late Cretaceous floodplain environment, BBC Prehistoric Planet style, 8K cinematic dramatic lighting, no cartoonish features",
+      "keywords": ["교합력", "이빨", "포식", "에드몬토사우루스"]
+    },
+    {
+      "scene_id": "S04",
+      "duration_sec": 25,
+      "narration_kr": "티렉스는 얼마나 빨리 달렸을까요? 놀랍게도 최신 연구는 시속 20~25km 수준으로 결론 짓습니다. 오히려 빠르게 걷는 수준이었을 것입니다. 하지만 이 속도로도 충분했습니다. 티렉스는 단거리 질주보다 긴 거리를 꾸준히 추적하는 스토킹 포식자였을 가능성이 높습니다. 강력한 후각과 앞을 향한 양안시는 먹이를 정확히 포착하는 데 최적화되어 있었습니다.",
+      "visual_description": "드넓은 백악기 범람원에서 티렉스가 먼 거리 하드로사우루스 무리를 천천히 추적하는 장면. 카메라는 와이드샷에서 티렉스 얼굴 클로즈업으로. 앞을 향한 두 눈이 먹이를 고정하는 모습.",
+      "image_prompt_en": "Photorealistic Tyrannosaurus rex stalking a herd of Edmontosaurus across a vast Late Cretaceous floodplain, wide establishing shot transitioning to close-up of forward-facing binocular eyes locked on prey, golden late afternoon light, heat haze on horizon, BBC Prehistoric Planet style, 8K, no cartoonish features",
+      "keywords": ["속도", "스토킹", "후각", "양안시"]
+    },
+    {
+      "scene_id": "S05",
+      "duration_sec": 20,
+      "narration_kr": "티렉스는 단독으로 살았을까요? 화석 증거는 때로 같은 장소에서 여러 개체가 발견된 경우를 보여줍니다. 일부 고생물학자들은 쌍을 이루거나 작은 무리를 형성했을 가능성도 제기합니다. 오늘날 코모도왕도마뱀처럼, 필요에 따라 타 개체와 먹이를 공유했을 수도 있습니다.",
+      "visual_description": "황혼 무렵 강변에서 두 마리의 성체 티렉스가 서로를 의식하며 같은 방향으로 걷는 장면. 강물에 반사된 실루엣. 뒤로 지는 노을.",
+      "image_prompt_en": "Two adult Tyrannosaurus rex walking along a Late Cretaceous river bank at dusk, their reflections in the water, silhouetted against a dramatic orange sunset, distant conifers and ferns, possible social behavior implied, BBC Prehistoric Planet style, 8K cinematic wide shot, no cartoonish features",
+      "keywords": ["사회성", "무리", "행동", "화석 증거"]
+    },
+    {
+      "scene_id": "S06",
+      "duration_sec": 20,
+      "narration_kr": "6,600만 년 전, 소행성 충돌로 공룡의 시대가 끝났습니다. 하지만 티라노사우루스의 이야기는 여기서 끝나지 않습니다. 오늘날 우리가 보는 새들 — 참새, 독수리, 닭 — 이 모두 공룡의 직접적인 후손입니다. 티렉스의 피가, 지금 이 순간에도 하늘을 날고 있습니다.",
+      "visual_description": "소행성 충돌의 여파로 하늘이 붉게 물드는 장면에서 페이드. 이어 현대의 독수리가 하늘을 나는 장면으로 오버랩. 공룡에서 새로의 진화를 상징하는 전환.",
+      "image_prompt_en": "Split-screen cinematic transition: fiery Late Cretaceous sky with asteroid impact glow on left fading into a modern eagle soaring in blue sky on right, symbolic dinosaur-to-bird evolution, BBC Prehistoric Planet style, photorealistic, 8K, emotional and epic, no cartoonish features",
+      "keywords": ["멸종", "소행성", "새", "진화적 유산"]
+    }
+  ],
+  "fact_summary": [
+    "성체 티렉스의 교합력은 최대 57,000뉴턴으로, 지구상 육상동물 중 가장 강력한 수준으로 추정된다.",
+    "성체의 피부 화석에서는 비늘이 발견되었으나, 유체(어린 개체)는 보온용 원시 깃털로 덮여있었을 가능성이 높다.",
+    "최신 보행 연구에 따르면 티렉스의 최고 속도는 시속 20~25km 수준으로, 스프린터보다는 스토킹 포식자였을 것으로 추정된다."
+  ],
+  "sources_note": "주요 화석 발견지: 미국 몬태나·사우스다코타·와이오밍, 캐나다 앨버타. 대표 표본: Sue(FMNH PR 2081), Stan(BHI 3033). 참고 연구: Bates & Falkingham 2012(교합력), Hutchinson & Garcia 2002(보행), Persons et al. 2017(피부 화석)."
+}

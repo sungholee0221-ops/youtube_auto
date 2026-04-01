@@ -1,0 +1,75 @@
+{
+  "week": 1,
+  "title_kr": "수메르, 도시가 태어나는 새벽",
+  "title_en": "Sumer: Dawn of the First Cities",
+  "period": "기원전 4500년경~기원전 1900년경",
+  "region": "메소포타미아 남부, 오늘날 이라크 남부",
+  "hook": "강이 남기고 간 진흙 위에, 인류는 처음으로 도시라는 꿈을 세웁니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+  "scenes": [
+    {
+      "scene_id": "S01",
+      "narration_kr": "아주 오래된 새벽입니다. 티그리스와 유프라테스가 천천히 흘러갑니다. 두 강 사이의 낮은 땅에는 아직 거대한 제국도, 돌로 쌓은 성벽도 없습니다. 대신 젖은 흙냄새가 있습니다. 갈대가 바람에 스치고, 진흙 벽돌을 말리는 사람들의 손길이 있습니다. 사람들은 해마다 범람하는 강을 두려워하면서도, 그 강이 남겨 놓는 비옥한 흙을 놓치지 않습니다. 그리고 바로 이곳, 메소포타미아 남부의 평원에서, 인류는 처음으로 함께 모여 오래 사는 방법을 배워 갑니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "동틀 무렵의 메소포타미아 평원, 두 강 사이 습지와 갈대밭, 진흙 벽돌을 말리는 초기 정착민들의 모습",
+      "image_prompt_en": "Photorealistic dawn over southern Mesopotamia wetlands between the Tigris and Euphrates, early Sumerian settlers shaping and drying mud bricks near reed marshes, historically accurate clothing and landscape, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["수메르", "메소포타미아"]
+    },
+    {
+      "scene_id": "S02",
+      "narration_kr": "처음부터 왕이 있는 나라는 아닙니다. 먼저 마을이 있습니다. 물길을 내고, 둑을 고치고, 곡식을 나누는 일이 생깁니다. 한 사람이 할 수 없는 일이 늘어나자, 사람들은 가까이 살아야 한다는 사실을 깨닫습니다. 이렇게 마을은 커지고, 커진 마을은 마침내 도시가 됩니다. 우루크와 우르, 라가시 같은 이름들이 조용히 역사 속에 모습을 드러냅니다. 도시는 단지 많은 집이 아닙니다. 사람들의 노동과 기억, 믿음과 두려움이 한곳에 모이는 새로운 삶의 방식입니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "관개 수로를 정비하는 주민들, 점차 커지는 진흙 벽돌 마을과 초기 도시의 전경",
+      "image_prompt_en": "Photorealistic early Sumerian town growing into a city, villagers digging irrigation canals and repairing embankments, mud-brick homes spreading across a flat Mesopotamian plain, historically accurate architecture and dress, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["도시국가", "관개"]
+    },
+    {
+      "scene_id": "S03",
+      "narration_kr": "수메르의 도시를 움직이는 힘은 돌이 아니라 물입니다. 비가 넉넉하지 않은 땅에서, 물은 하늘이 아니라 사람의 손으로 다스려야 하는 선물이 됩니다. 누군가는 수로를 파고, 누군가는 둑을 쌓고, 누군가는 물이 어느 밭으로 먼저 들어갈지 정해야 합니다. 이 작은 결정들이 쌓여 질서가 됩니다. 그리고 질서는 권력이 됩니다. 수메르의 도시국가는 이렇게 자연과 싸워 이기기보다, 자연의 변덕을 함께 견디는 과정 속에서 태어납니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "넓은 평원 위 관개 수로와 둑, 물의 흐름을 살피는 관리와 농민들",
+      "image_prompt_en": "Photorealistic Sumerian irrigation network across a dry alluvial plain, farmers and overseers directing canal water into fields, earthen levees and waterways under golden light, historically accurate tools and dress, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["수로", "농업"]
+    },
+    {
+      "scene_id": "S04",
+      "narration_kr": "도시의 한가운데에는 높은 신전이 서기 시작합니다. 훗날 지구라트로 이어지는 그 높은 구조물의 앞에서 사람들은 하늘과 땅이 이어져 있다고 믿습니다. 신은 멀리 있지만, 신전은 늘 눈앞에 있습니다. 곡식은 창고에 쌓이고, 제사는 계절을 따라 이어집니다. 사제는 단지 기도를 올리는 사람이 아니라, 도시의 시간을 정리하고 물자를 관리하는 사람으로도 보입니다. 수메르에서 신앙은 마음의 문제이면서 동시에 도시 운영의 질서이기도 합니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "도시 중심의 초기 신전 단지, 제물을 드리는 사람들과 곡식 창고, 신전을 올려다보는 주민들",
+      "image_prompt_en": "Photorealistic early Sumerian temple complex at the center of a city, worshippers bringing offerings and grain to temple storerooms, priests overseeing rituals, historically accurate mud-brick sacred architecture, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["신전", "지구라트"]
+    },
+    {
+      "scene_id": "S05",
+      "narration_kr": "사람이 많아질수록, 기억만으로는 도시를 다스릴 수 없습니다. 누가 얼마의 곡식을 바쳤는지, 어느 창고에 보리가 남아 있는지, 어떤 땅에 물을 돌렸는지를 기록해야 합니다. 그래서 진흙판 위에 작은 흔적이 남기기 시작합니다. 처음에는 물건을 세기 위한 표시였을지 모릅니다. 그러나 그 표시는 점점 더 많은 뜻을 품습니다. 쐐기문자라 불리게 될 이 기록의 습관은, 말이 사라진 뒤에도 생각이 남을 수 있다는 놀라운 가능성을 엽니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "젖은 점토판에 갈대 펜으로 표식을 새기는 서기, 창고와 행정 기록 장면",
+      "image_prompt_en": "Photorealistic Sumerian scribe pressing reed stylus marks into a wet clay tablet inside a temple storehouse, baskets of grain and administrative goods nearby, historically accurate writing tools and setting, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["쐐기문자", "기록"]
+    },
+    {
+      "scene_id": "S06",
+      "narration_kr": "이제 도시는 서로를 의식합니다. 더 넓은 밭, 더 안정된 물길, 더 많은 노동력과 더 큰 신전. 이런 것들을 두고 도시와 도시가 경쟁합니다. 때로는 교역하고, 때로는 충돌합니다. 수메르의 세계는 하나의 나라라기보다, 서로 닮았지만 끝내 하나가 되지 않는 도시들의 모임에 가깝습니다. 그래서 그들의 역사는 늘 가까운 이웃과의 협상, 긴장, 그리고 자존심의 역사이기도 합니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "성벽과 운하를 사이에 둔 여러 수메르 도시국가, 교역 행렬과 긴장감 있는 대치 장면",
+      "image_prompt_en": "Photorealistic rival Sumerian city-states across canals and open plains, merchants with donkey caravans and armed retainers near mud-brick walls, historically accurate early urban Mesopotamian setting, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["도시국가", "교역"]
+    },
+    {
+      "scene_id": "S07",
+      "narration_kr": "수메르 사람들도 자신들의 영웅을 이야기합니다. 그 가운데 가장 오래 남는 이름 하나가 길가메시입니다. 그는 우루크의 왕으로 전해지며, 강한 힘과 깊은 두려움을 함께 지닌 인물로 그려집니다. 친구의 죽음 앞에서 흔들리고, 인간이 피할 수 없는 운명을 묻습니다. 이 이야기는 단순한 전설을 넘어, 아주 오래전 사람들 역시 사랑과 상실, 삶의 짧음을 알고 있었다는 사실을 들려줍니다. 수메르의 점토판은 도시의 회계만이 아니라 인간의 마음도 함께 기록합니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "성벽 위에서 도시를 바라보는 길가메시의 상징적 장면, 서사시적 분위기의 우루크",
+      "image_prompt_en": "Photorealistic symbolic scene of Gilgamesh overlooking the city of Uruk from massive mud-brick walls, epic yet introspective atmosphere, historically grounded Sumerian urban landscape, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["길가메시", "우루크"]
+    },
+    {
+      "scene_id": "S08",
+      "narration_kr": "하지만 어떤 도시도 영원하지 않습니다. 강의 흐름은 바뀌고, 땅은 소금을 머금으며, 전쟁은 사람을 지치게 합니다. 바깥에서 온 세력은 수메르의 세계를 흔들고, 안에서는 오래된 질서가 조금씩 힘을 잃어 갑니다. 시간이 지나며 아카드와 바빌로니아 같은 새로운 이름들이 무대에 오릅니다. 그럼에도 수메르가 사라졌다고 말하기는 어렵습니다. 도시를 운영하는 법, 기록을 남기는 법, 신전과 행정이 엮이는 방식은 이후의 문명 속으로 깊이 스며들기 때문입니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "쇠퇴해 가는 수메르 도시의 운하와 염분이 낀 들판, 멀리 다가오는 새로운 세력의 행렬",
+      "image_prompt_en": "Photorealistic declining Sumerian city with silting canals and salt-streaked fields, weary inhabitants and distant approaching foreign powers, historically accurate late Bronze Age Mesopotamian atmosphere, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["쇠퇴", "아카드"]
+    },
+    {
+      "scene_id": "S09",
+      "narration_kr": "잠들기 전 이 오래된 도시들을 다시 떠올려 봅니다. 수메르는 가장 화려한 제국으로 시작하지 않습니다. 그들은 먼저 물을 다스리려 했고, 곡식을 저장하려 했고, 함께 살아갈 규칙을 만들려 했습니다. 아주 소박해 보이는 이 노력 속에서 인류 문명의 핵심이 태어납니다. 도시, 기록, 제도, 그리고 집단의 기억. 우리가 오늘 너무도 당연하게 여기는 많은 것들이, 사실은 이 진흙의 땅에서 천천히 시작되고 있습니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+      "visual_description": "해질녘 황금빛 아래 펼쳐진 수메르 도시의 전경, 운하와 신전, 집들이 조용히 보이는 마무리 장면",
+      "image_prompt_en": "Photorealistic sunset panorama of a Sumerian city with canals, temple precinct, and clustered mud-brick homes fading into evening light, historically accurate Mesopotamian setting, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
+      "keywords": ["문명", "유산"]
+    }
+  ],
+  "episode_summary": "두 강 사이의 진흙 땅에서, 인류 최초의 도시와 기록, 그리고 문명의 질서가 어떻게 태어나는지 따라가는 에피소드입니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+  "sources_note": "기본 에피소드 주제와 기간은 Space 제공 일정표 52weeks_history.csv의 1주차 ‘Sumer’ 항목을 바탕으로 구성했습니다. 세부 서술은 일반적으로 알려진 수메르 문명사의 흐름을 따르며, 도시국가·관개·신전·쐐기문자·길가메시 서사는 대표적 학설과 전승에 근거한 서술입니다. " [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+}

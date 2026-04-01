@@ -71,6 +71,16 @@ def reset_used_items(table: str, filter_col: str | None = None, filter_val: str 
     return count
 
 
+def get_next_week(channel: str) -> dict | None:
+    """weekly_schedule 테이블에서 다음 미사용 주차를 반환한다."""
+    return get_unused_item("weekly_schedule", "channel", channel)
+
+
+def mark_week_used(week_id: int) -> None:
+    """주차의 is_used를 true로 업데이트한다."""
+    mark_as_used("weekly_schedule", week_id)
+
+
 def update_category_used(table: str, item_id: int) -> None:
     """카테고리의 last_used_at을 현재 시각으로 업데이트한다."""
     from datetime import datetime, timezone

@@ -1,0 +1,53 @@
+﻿week,title_kr,title_en,region,period
+1,"문명의 새벽 — 수메르, 최초의 도시들",Dawn of Civilization: Sumer,메소포타미아,BC 4500-3000
+2,쐐기문자의 탄생 — 인류 최초의 문자,Birth of Writing: Cuneiform,메소포타미아,BC 3200
+3,길가메시 서사시 — 최초의 영웅 이야기,Epic of Gilgamesh,메소포타미아,BC 2700
+4,아카드 제국 — 사르곤 대왕의 정복,Akkadian Empire: Sargon the Great,메소포타미아,BC 2334
+5,함무라비 법전 — 최초의 성문법,Code of Hammurabi,바빌로니아,BC 1754
+6,아시리아 제국 — 고대 근동의 지배자,Assyrian Empire,메소포타미아,BC 900-600
+7,바빌론의 영광 — 느부갓네살과 공중정원,Glory of Babylon,바빌로니아,BC 600
+8,페르시아 제국 — 키루스 대왕의 관용,Persian Empire: Cyrus the Great,페르시아,BC 550
+9,나일강의 선물 — 고대 이집트의 탄생,Gift of the Nile,이집트,BC 3100
+10,피라미드의 비밀 — 쿠푸왕과 대피라미드,Secrets of the Pyramids,이집트,BC 2560
+11,파라오의 신화 — 신과 인간 사이,Myth of the Pharaoh,이집트,BC 2500
+12,투탕카멘 — 소년 왕의 짧은 생애,Tutankhamun: The Boy King,이집트,BC 1332
+13,람세스 2세 — 위대한 파라오의 시대,Ramesses II: The Great,이집트,BC 1279
+14,클레오파트라 — 이집트 마지막 여왕,Cleopatra: Last Queen of Egypt,이집트,BC 51
+15,미라와 사후세계 — 이집트인의 죽음관,Mummies and the Afterlife,이집트,BC 2000
+16,히에로글리프 — 로제타석의 수수께끼,Hieroglyphs & the Rosetta Stone,이집트,BC 196
+17,그리스의 아침 — 폴리스와 민주주의의 탄생,Birth of Democracy: Greek Polis,그리스,BC 800-500
+18,페르시아 전쟁 — 테르모필레의 300전사,Battle of Thermopylae,그리스,BC 480
+19,아테네의 황금기 — 페리클레스와 파르테논,Golden Age of Athens,그리스,BC 461-429
+20,소크라테스의 죽음 — 철학자의 마지막 선택,Death of Socrates,그리스,BC 399
+21,알렉산드로스 대왕 — 세계를 정복한 청년,Alexander the Great,마케도니아,BC 356-323
+22,헬레니즘 — 동서 문명의 융합,Hellenism: East Meets West,헬레니즘,BC 323-30
+23,로마의 건국 — 늑대와 쌍둥이 형제,Founding of Rome,로마,BC 753
+24,포에니 전쟁 — 한니발과 로마의 대결,Punic Wars: Hannibal vs Rome,로마,BC 264-146
+25,율리우스 카이사르 — 주사위는 던져졌다,Julius Caesar,로마,BC 100-44
+26,로마 제국의 탄생 — 아우구스투스의 시대,Birth of the Roman Empire,로마,BC 27
+27,팍스 로마나 — 제국의 200년 평화,Pax Romana,로마,AD 27-180
+28,폼페이 최후의 날 — 베수비오 화산,Last Day of Pompeii,로마,AD 79
+29,콘스탄티누스 — 기독교를 품은 황제,Constantine and Christianity,로마,AD 306
+30,로마의 멸망 — 영원한 도시의 황혼,Fall of Rome,로마,AD 476
+31,비잔티움 — 동로마 제국 천년의 역사,Byzantine Empire,비잔티움,AD 476-1453
+32,이슬람의 탄생 — 무함마드와 새로운 세계,Birth of Islam,이슬람,AD 610
+33,샤를마뉴 — 유럽의 아버지,Charlemagne: Father of Europe,프랑크,AD 768
+34,바이킹 — 바다의 전사들,Vikings: Warriors of the Sea,스칸디나비아,AD 793-1066
+35,십자군 전쟁 — 신의 이름으로,The Crusades,중세 유럽,AD 1096
+36,칭기즈칸 — 역사상 최대의 제국,Genghis Khan,몽골,AD 1162
+37,흑사병 — 유럽을 뒤흔든 재앙,The Black Death,유럽,AD 1347
+38,백년전쟁과 잔 다르크,Hundred Years War & Joan of Arc,프랑스/영국,AD 1337
+40,오스만 제국 — 콘스탄티노플의 함락,Ottoman Empire: Fall of Constantinople,오스만,AD 1453
+39,르네상스 — 인간의 재발견,The Renaissance,이탈리아,AD 1400
+41,대항해시대 — 콜럼버스와 신대륙,Age of Exploration,유럽,AD 1492
+42,종교개혁 — 루터의 95개조 반박문,Protestant Reformation,독일,AD 1517
+43,30년 전쟁 — 유럽을 바꾼 종교 전쟁,Thirty Years War,유럽,AD 1618
+44,명예혁명과 권리장전 — 민주주의의 씨앗,Glorious Revolution,영국,AD 1688
+45,"프랑스 혁명 — 자유, 평등, 박애",French Revolution,프랑스,AD 1789
+46,나폴레옹 — 코르시카 소년의 유럽 정복,Napoleon Bonaparte,프랑스,AD 1769
+47,산업혁명 — 세계를 바꾼 증기기관,Industrial Revolution,영국,AD 1760
+48,미국 독립 — 새로운 나라의 탄생,American Independence,미국,AD 1776
+49,1차 세계대전 — 모든 전쟁을 끝내기 위한 전쟁,World War I,유럽,AD 1914
+50,2차 세계대전 — 인류 최대의 비극,World War II,세계,AD 1939
+51,냉전 — 이념의 전쟁,The Cold War,세계,AD 1947
+52,베를린 장벽의 붕괴 — 현대의 시작,Fall of the Berlin Wall,독일,AD 1989

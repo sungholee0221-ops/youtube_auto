@@ -1,142 +1,161 @@
 """
-채널 3 · 역사이야기 자동화
-- 매주 1회 실행
-- Supabase에서 카테고리 순환 선택 (한국사/세계사/인물/전쟁/문명)
-- Claude API로 주제 선정 → 2시간 분량 스크립트 생성
-- 병렬: Google TTS Long Audio + HuggingFace 이미지 + 배경음악
-- FFmpeg으로 영상 + 음성 + 배경음 믹싱
-- Claude API로 제목/설명/태그 생성
-- 로컬 저장 (mp4 + txt)
+채널 3 · 역사이야기 자동화 (소스폴더 기반)
 
-⚠️ 채널 1, 2 완성 후 구현 예정 (현재 미완성 상태)
+파이프라인:
+1. Supabase weekly_schedule에서 다음 미사용 주차 조회
+2. channel3_source/{folder}/script.json 읽기 → TTS 생성
+3. 씬별 이미지(PNG) + 오프닝 영상 로드
+4. FFmpeg: 오프닝(5초) + 이미지 슬라이드쇼 + TTS 합성
+   (duration_sec 없는 경우 → 오디오 길이 / 이미지 수로 자동 계산)
+5. Claude API로 제목/설명/태그 생성
+6. b4_upload/ 저장 + Supabase 업데이트
 """
 
 import os
+import re
 import sys
+import json
 import tempfile
 import logging
-from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.file_utils import setup_logging, save_output, cleanup_temp
-from shared.supabase_client import get_next_category, update_category_used
-from shared.claude_api import generate_topic, generate_long_script, generate_title_description
+from shared.supabase_client import get_next_week, mark_week_used
+from shared.claude_api import generate_title_description
 from shared.tts import synthesize_speech
-from shared.image_gen import generate_images
-from shared.ffmpeg_utils import create_history_video, capture_thumbnail, mix_audio
+from shared.ffmpeg_utils import create_channel_video, capture_thumbnail
 from shared.thumbnail import add_thumbnail_overlay
 
 logger = logging.getLogger(__name__)
 
+SOURCE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "channel3_source")
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR_HISTORY", "/Users/sungho/youtube_auto/b4_upload")
-BGM_PATH = os.environ.get("BGM_PATH", "")
-IMAGE_COUNT = int(os.environ.get("HISTORY_IMAGE_COUNT", "60"))
+
+
+def _load_source(folder_path: str) -> tuple[str, list[str]]:
+    """JSON 읽기 → (나레이션 텍스트, 이미지 경로 목록)
+
+    history JSON은 씬별 duration_sec 없음 → create_channel_video에서 오디오 기반 자동 계산.
+    JSON에 포함된 Perplexity 인용 링크를 사전 제거한다.
+    """
+    json_files = list(Path(folder_path).glob("*.json"))
+    if not json_files:
+        raise FileNotFoundError(f"JSON 파일 없음: {folder_path}")
+
+    with open(json_files[0], "r", encoding="utf-8") as f:
+        raw = f.read()
+
+    # Perplexity 인용 링크 제거: , [ppl-ai-...](url) → ,
+    raw = re.sub(r"(,?)\s*\[ppl-ai-file-upload[^\]]*\]\([^\)]+\)", r"\1", raw)
+    data = json.loads(raw)
+
+    scenes = data["scenes"]
+
+    # 나레이션 이어붙이기
+    narration = "\n\n".join(s["narration_kr"] for s in scenes)
+
+    # 이미지 파일 S번호 순 정렬
+    png_files = list(Path(folder_path).glob("*.png"))
+
+    def _scene_key(p: Path) -> int:
+        m = re.search(r"_S(\d+)_", p.name, re.IGNORECASE)
+        return int(m.group(1)) if m else 999
+
+    image_paths = [str(p) for p in sorted(png_files, key=_scene_key)]
+
+    return narration, image_paths
 
 
 def main():
     setup_logging("channel3_history")
     logger.info("=== 채널 3 (역사이야기) 실행 시작 ===")
 
-    # 1. 카테고리 순환 선택
-    category = get_next_category("history_categories")
-    if not category:
-        logger.warning("사용 가능한 카테고리가 없습니다.")
+    # 1. Supabase에서 다음 주차 조회
+    week = get_next_week("history")
+    if not week:
+        logger.warning("사용 가능한 주차가 없습니다. (weekly_schedule 테이블 확인)")
         return
 
-    cat_name = category["category"]
-    cat_id = category["id"]
-    logger.info(f"카테고리: {cat_name} (id={cat_id})")
+    week_num    = week["week_num"]
+    folder_name = week["folder_name"]
+    title_kr    = week["title_kr"]
+    week_id     = week["id"]
+    logger.info(f"{week_num}주차: {title_kr} (folder={folder_name})")
 
-    tmp_dir = tempfile.mkdtemp(prefix="history_")
+    # 2. 소스 경로 확인
+    folder_path  = os.path.join(SOURCE_DIR, folder_name)
+    opening_path = os.path.join(SOURCE_DIR, "history_opening.mp4")
+
+    if not os.path.isdir(folder_path):
+        raise FileNotFoundError(f"소스 폴더 없음: {folder_path}")
+    if not os.path.exists(opening_path):
+        raise FileNotFoundError(f"오프닝 영상 없음: {opening_path}")
+
+    tmp_dir   = tempfile.mkdtemp(prefix="history_")
     tmp_audio = os.path.join(tmp_dir, "narration.mp3")
-    tmp_img_dir = os.path.join(tmp_dir, "images")
-    tmp_video_raw = os.path.join(tmp_dir, "raw.mp4")
     tmp_video = os.path.join(tmp_dir, "output.mp4")
     tmp_thumb = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
-        # 2. Claude API로 주제 선정
-        logger.info("주제 선정 중...")
-        topic = generate_topic(
-            f"'{cat_name}' 카테고리에서 유튜브 역사 다큐 영상으로 적합한 구체적 주제 1개를 선정해줘.\n"
-            "주제명만 10자 이내 단어/짧은 구로 답해줘. (예: 명량해전, 칭기즈칸, 로마제국 멸망)"
-        ).strip().lstrip("#").strip()
-        logger.info(f"선정된 주제: {topic}")
+        # 3. 소스 JSON 로드
+        logger.info("소스 JSON 로드 중...")
+        narration, image_paths = _load_source(folder_path)
+        logger.info(f"나레이션: {len(narration)}자, 이미지: {len(image_paths)}장")
 
-        # 3. 1시간 분량 스크립트 생성 (6섹션 × 10분)
-        logger.info("1시간 분량 스크립트 생성 중 (6섹션)...")
-        script = generate_long_script(topic, sections=6)
-        logger.info(f"스크립트 생성 완료: {len(script)}자")
+        if not image_paths:
+            raise FileNotFoundError(f"PNG 이미지 없음: {folder_path}")
 
-        # 4. 병렬 처리: TTS + 이미지 생성
-        logger.info("TTS + 이미지 병렬 생성 시작...")
+        # 4. TTS 생성 (history 채널 목소리: Wavenet-D, 느리고 낮은 톤)
+        logger.info("TTS 생성 중...")
+        synthesize_speech(narration, tmp_audio, channel="history")
+        logger.info(f"TTS 완료: {tmp_audio}")
 
-        image_style = (
-            f"{topic}, historical painting style, dramatic cinematic lighting, "
-            "detailed illustration, 4K quality, epic historical scene"
+        # 5. FFmpeg: 오프닝 + 슬라이드쇼 + TTS
+        #    image_durations=None → 오디오 길이 / 이미지 수 자동 계산
+        logger.info("영상 합성 시작...")
+        create_channel_video(
+            opening_path=opening_path,
+            image_list=image_paths,
+            audio_path=tmp_audio,
+            output_path=tmp_video,
+            image_durations=None,
         )
 
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            future_tts = executor.submit(synthesize_speech, script, tmp_audio, "history")
-            future_img = executor.submit(
-                generate_images, topic, tmp_img_dir,
-                count=IMAGE_COUNT, style=image_style, channel="history",
-            )
-
-            audio_path = future_tts.result()
-            image_paths = future_img.result()
-
-        logger.info(f"TTS 완료: {audio_path}")
-        logger.info(f"이미지 {len(image_paths)}장 생성 완료")
-
-        # 5. FFmpeg 영상 합성 (3분 슬라이드쇼 + 나머지 검은 화면)
-        logger.info("영상 합성 시작 (3분 시각 + 검은 화면)...")
-        create_history_video(image_paths, audio_path, tmp_video_raw, visual_duration=180)
-
-        # 6. 배경음악 믹싱
-        if BGM_PATH and os.path.exists(BGM_PATH):
-            logger.info("배경음악 믹싱 시작...")
-            mix_audio(tmp_video_raw, BGM_PATH, tmp_video, bgm_volume=0.15)
-        else:
-            logger.warning("배경음악 파일 없음, 음성만 사용")
-            tmp_video = tmp_video_raw
-
-        # 6-1. 썸네일 캡처 + 오버레이
+        # 6. 썸네일
         capture_thumbnail(tmp_video, tmp_thumb)
-        add_thumbnail_overlay(tmp_thumb, tmp_thumb, channel="history", top_text=topic)
+        add_thumbnail_overlay(tmp_thumb, tmp_thumb, channel="history", top_text=title_kr)
 
-        # 7. Claude API로 제목/설명 생성
+        # 7. Claude: 제목/설명/태그
         logger.info("제목/설명 생성 중...")
         meta = generate_title_description(
-            f"'{topic}'에 대한 유튜브 역사 다큐 영상의 제목, 설명, SEO 태그를 한국어로 만들어줘.\n"
-            "수면 유도에 적합한 차분한 분위기를 반영해줘.\n"
-            "태그는 검색 최적화를 위해 30개 생성해줘. (예: 역사,한국사,수면,다큐멘터리,ASMR,세계사,나레이션,수면유도,힐링,문명,전쟁사,...)\n"
+            f"'{title_kr}'에 대한 유튜브 역사 다큐 영상의 제목, 설명, SEO 태그를 한국어로 만들어줘.\n"
+            "수면 유도에 적합한 차분하고 교육적인 BBC 다큐멘터리 분위기.\n"
+            "태그는 검색 최적화를 위해 30개 생성해줘.\n"
             'JSON 형식으로만 답해줘: {"title": "...", "description": "...", "tags": ["태그1","태그2",...]}'
         )
-        title = meta["title"]
+        title       = meta["title"]
         description = meta["description"]
-        tags = meta.get("tags", [])
+        tags        = meta.get("tags", [])
         logger.info(f"생성된 제목: {title}")
 
-        # 8. 로컬 저장
-        duration_label = "15min"
-
+        # 8. 저장
         result = save_output(
             video_path=tmp_video,
             title=title,
             description=description,
             output_dir=OUTPUT_DIR,
             channel="history",
-            topic=topic,
-            duration_label=duration_label,
+            topic=title_kr,
+            duration_label="15min",
             tags=tags,
             thumbnail_path=tmp_thumb,
         )
         logger.info(f"저장 완료: {result}")
 
-        # 9. Supabase 카테고리 업데이트
-        update_category_used("history_categories", cat_id)
+        # 9. Supabase 주차 업데이트
+        mark_week_used(week_id)
 
     except Exception as e:
         logger.error(f"채널 3 실행 실패: {e}", exc_info=True)

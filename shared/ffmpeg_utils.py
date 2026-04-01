@@ -269,6 +269,93 @@ def create_history_video(
     return output_path
 
 
+def create_channel_video(
+    opening_path: str,
+    image_list: list[str],
+    audio_path: str,
+    output_path: str,
+    image_durations: list[int] | None = None,
+    default_sec: int = 10,
+) -> str:
+    """오프닝(mp4) + 이미지 슬라이드쇼 + TTS 음성을 합성한다.
+
+    image_durations: 씬별 초. None이면 오디오 길이를 이미지 수로 균등 분배.
+    """
+    import tempfile
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+    if not image_list:
+        raise ValueError("이미지 목록이 비어 있습니다.")
+
+    # 이미지 durations 결정
+    if image_durations is None:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", audio_path],
+            capture_output=True, text=True,
+        )
+        audio_dur = float(probe.stdout.strip() or "0") or (len(image_list) * default_sec)
+        sec_each = max(default_sec, int(audio_dur / len(image_list)))
+        image_durations = [sec_each] * len(image_list)
+
+    with tempfile.TemporaryDirectory(prefix="channel_build_") as tmp:
+        opening_clip = os.path.join(tmp, "opening.mp4")
+        slideshow    = os.path.join(tmp, "slideshow.mp4")
+        combined     = os.path.join(tmp, "combined.mp4")
+        concat_txt   = os.path.join(tmp, "concat.txt")
+        list_file    = os.path.join(tmp, "images.txt")
+
+        # 1. 오프닝 → 1920x1080, 24fps, yuv420p, 무음
+        _run_ffmpeg([
+            "-i", opening_path,
+            "-vf", (
+                "scale=1920:1080:force_original_aspect_ratio=decrease,"
+                "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24"
+            ),
+            "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
+            "-pix_fmt", "yuv420p", "-an",
+            "-y", opening_clip,
+        ], desc="opening_clip")
+
+        # 2. 이미지 슬라이드쇼 (씬별 duration)
+        with open(list_file, "w") as f:
+            for img, dur in zip(image_list, image_durations):
+                f.write(f"file '{img}'\n")
+                f.write(f"duration {dur}\n")
+            f.write(f"file '{image_list[-1]}'\n")
+
+        _run_ffmpeg([
+            "-f", "concat", "-safe", "0", "-i", list_file,
+            "-vf", (
+                "scale=1920:1080:force_original_aspect_ratio=decrease,"
+                "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24"
+            ),
+            "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
+            "-pix_fmt", "yuv420p", "-r", "24", "-an",
+            "-y", slideshow,
+        ], desc="slideshow")
+
+        # 3. 오프닝 + 슬라이드쇼 이어붙이기
+        with open(concat_txt, "w") as f:
+            f.write(f"file '{opening_clip}'\n")
+            f.write(f"file '{slideshow}'\n")
+
+        _run_ffmpeg([
+            "-f", "concat", "-safe", "0", "-i", concat_txt,
+            "-c", "copy", "-y", combined,
+        ], desc="concat_opening_slideshow")
+
+        # 4. 영상 + TTS 음성 합성
+        _run_ffmpeg([
+            "-i", combined, "-i", audio_path,
+            "-vcodec", "copy", "-acodec", "aac", "-ab", "192k",
+            "-shortest", "-y", output_path,
+        ], desc="mux_audio")
+
+    _check_output(output_path, "create_channel_video")
+    return output_path
+
+
 def mix_audio(
     video_path: str,
     bgm_path: str,
