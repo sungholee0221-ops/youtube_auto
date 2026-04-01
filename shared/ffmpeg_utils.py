@@ -130,7 +130,7 @@ def create_rain_video(
         combined     = os.path.join(tmp, "combined.mp4")
         looped_audio = os.path.join(tmp, "audio.m4a")
 
-        # 1. Pexels 영상 → visual_duration초, 1920x1080, 무음, 끝 5초 페이드아웃
+        # 1. Pexels 영상 → visual_duration초, 1920x1080, 24fps, 무음, 끝 5초 페이드아웃
         fade_duration = 5
         fade_start = visual_duration - fade_duration
         _run_ffmpeg([
@@ -139,17 +139,20 @@ def create_rain_video(
             "-vf", (
                 "scale=1920:1080:force_original_aspect_ratio=decrease,"
                 "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,"
+                f"fps=24,"
                 f"fade=t=out:st={fade_start}:d={fade_duration}"
             ),
-            "-vcodec", "libx264", "-crf", "23", "-preset", "fast", "-an",
+            "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
+            "-pix_fmt", "yuv420p", "-an",
             "-y", visual_clip,
         ], desc="rain_visual")
 
-        # 2. 검은 화면 생성 (나머지 시간)
+        # 2. 검은 화면 생성 (ultrafast + CRF51, 동일 스펙: 24fps, yuv420p)
         _run_ffmpeg([
-            "-f", "lavfi", "-i", f"color=c=black:size=1920x1080:rate=24",
+            "-f", "lavfi", "-i", "color=c=black:size=1920x1080:rate=24",
             "-t", str(black_duration),
-            "-vcodec", "libx264", "-crf", "23", "-preset", "fast", "-an",
+            "-vcodec", "libx264", "-crf", "51", "-preset", "ultrafast",
+            "-tune", "stillimage", "-pix_fmt", "yuv420p", "-an",
             "-y", black_clip,
         ], desc="rain_black")
 
