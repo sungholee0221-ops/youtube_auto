@@ -1,0 +1,59 @@
+{
+  "week": 2,
+  "title_kr": "트리케라톱스",
+  "title_en": "Triceratops",
+  "period": "후기 백악기 (약 6,800만 ~ 6,600만 년 전)",
+  "hook": "세 개의 뿔, 그리고 마지막 공룡의 시대를 살아낸 진짜 전사",
+  "scenes": [
+    {
+      "scene_id": "S01",
+      "narration_kr": "지금으로부터 약 6,600만 년 전, 북아메리카 대륙의 서쪽 끝, 라라미디아라 불리는 섬 대륙 위에 새벽 안개가 깔려 있습니다. 헬 크리크 층의 범람원, 축축한 흙 위에 육중한 발자국이 찍혀 갑니다. 한 걸음에 땅이 울립니다. 길이 9미터, 무게 10톤에 달하는 거대한 몸집이 안개를 가르며 모습을 드러냅니다. 바로 트리케라톱스입니다. 이 행성 역사상 가장 많은 화석이 발굴된 공룡 중 하나이자, 공룡 시대의 마지막 챕터를 장식한 진정한 지배자입니다. 50개가 넘는 두개골 화석이 북아메리카 전역에서 발견되었을 만큼, 트리케라톱스는 당시 생태계의 가장 풍부한 대형 초식동물이었습니다. 눈앞의 이 개체는 완전히 성장한 수컷. 이마를 장식한 두 개의 긴 뿔은 거의 1미터에 달합니다.",
+      "visual_description": "새벽 안개 속 헬 크리크 범람원. 거대한 트리케라톱스 한 마리가 측면 앵글로 등장. 피부는 코끼리처럼 두껍고 회갈색, 뿔과 프릴에는 붉은 혈색 문양이 은은하게. 발걸음마다 진흙이 튀고 안개가 걷히며 새벽 햇살이 스며드는 장면. 배경은 침엽수림과 야자수.",
+      "image_prompt_en": "Photorealistic Triceratops horridus adult male walking through misty floodplain at dawn, paleontologically accurate thick elephant-like skin with gray-brown coloration, red-orange frill patterning, two 1-meter brow horns, BBC Prehistoric Planet style, 8K cinematic, Hell Creek Formation environment with conifers and palms, morning mist, golden hour lighting, 16:9 cinematic composition, no cartoonish features",
+      "keywords": ["트리케라톱스", "헬 크리크 층", "후기 백악기", "라라미디아", "초식공룡"]
+    },
+    {
+      "scene_id": "S02",
+      "narration_kr": "트리케라톱스의 가장 눈길을 끄는 특징은 당연히 그 머리입니다. 전체 몸길이의 3분의 1을 차지할 만큼 거대한 두개골은 육상 척추동물 중 가장 큰 축에 속합니다. 코 위의 작은 뿔 하나, 눈 위로 솟은 두 개의 긴 뿔, 그리고 목을 보호하는 커다란 뼈 프릴까지. 2026년 발표된 도쿄 대학 연구팀의 최신 연구에 따르면, 트리케라톱스의 비강은 다른 대부분의 동물에 비해 비정상적으로 컸습니다. CT 스캔으로 두개골 내부를 분석한 결과, 새나 포유류에서 발견되는 호흡 터빈이라 불리는 특수 구조가 존재했습니다. 이 구조 덕분에 트리케라톱스는 거대한 두개골 내부의 온도와 습도를 정밀하게 조절할 수 있었을 것으로 추정됩니다. 거대한 뿔과 프릴 역시 단순한 무기가 아니었을 가능성이 높습니다. 종 내부 소통, 파트너 선택, 그리고 체온 조절까지 다양한 역할을 동시에 수행했을 것으로 과학자들은 보고 있습니다.",
+      "visual_description": "트리케라톱스 두개골 클로즈업. 카메라가 뿔 끝에서 시작해 프릴의 가장자리를 따라 천천히 이동. 프릴 표면에 혈관이 맥동하듯 움직이며 색이 붉게 변했다가 옅어지는 장면. 이어서 두개골 반단면 인포그래픽 스타일 삽입 — 비강 내부의 복잡한 구조 묘사.",
+      "image_prompt_en": "Extreme close-up photorealistic Triceratops horridus skull and frill, paleontologically accurate, showing intricate vascular patterning on frill with subtle color change from pale to reddish-orange, BBC Prehistoric Planet style, 8K macro detail, warm afternoon light highlighting bone texture and keratin horn surface, 16:9 cinematic composition, no cartoonish features",
+      "keywords": ["두개골", "프릴", "뿔", "체온조절", "비강", "도쿄대 연구"]
+    },
+    {
+      "scene_id": "S03",
+      "narration_kr": "이제 트리케라톱스의 식사 시간입니다. 범람원 가장자리, 고사리와 야자수가 무성한 지역에 이 개체가 걸음을 늦춥니다. 트리케라톱스는 완전한 초식동물이었습니다. 앵무새처럼 날카로운 부리로 식물을 잘라내고, 턱 깊숙이 배열된 수백 개의 이빨이 그것을 갈아 부셨습니다. 이 이빨들은 마치 배터리처럼 겹겹이 쌓여, 닳으면 새 이빨이 올라오는 구조였습니다. 고사리, 야자나무, 침엽수, 그리고 소철류가 주식이었습니다. 동위원소 분석 연구에 따르면 같은 환경에 살았던 에드몬토사우루스와 먹이를 나눠 먹는 생태적 분업, 즉 니치 파티셔닝을 했을 가능성이 제시됩니다. 수백만 년의 진화가 빚어낸 최고의 식물 분쇄기, 트리케라톱스가 느리고 힘차게 나뭇가지를 꺾어 먹습니다.",
+      "visual_description": "트리케라톱스가 고사리와 야자수 사이에서 먹이를 먹는 장면. 강력한 부리로 식물 줄기를 잘라내는 모습을 측면 클로즈업으로. 턱 근육의 움직임이 피부 밑으로 느껴지는 디테일. 배경은 따뜻한 오후 햇살과 강물이 반짝이는 범람원.",
+      "image_prompt_en": "Photorealistic Triceratops horridus feeding on cycads and ferns in a lush Late Cretaceous floodplain, paleontologically accurate, close-up side profile showing powerful beak and jaw muscles, BBC Prehistoric Planet style, 8K, warm golden afternoon light, dense Cretaceous vegetation with palms and conifers, shallow river in background, 16:9 cinematic composition, no cartoonish features",
+      "keywords": ["초식", "이빨 배터리", "부리", "고사리", "소철", "니치 파티셔닝"]
+    },
+    {
+      "scene_id": "S04",
+      "narration_kr": "그렇다면 트리케라톱스는 혼자 살았을까요, 아니면 무리를 지어 살았을까요? 오랫동안 트리케라톱스 화석은 거의 모두 단독 개체로 발굴되어, 고독한 동물이었을 것이라는 통설이 지배적이었습니다. 하지만 와이오밍 주의 '다넬 트리케라톱스 봉베드'라는 지역에서 세상에서 가장 큰 트리케라톱스 화석 군집지가 발견되었습니다. 세 마리의 어린 개체가 함께 발견된 몬태나 봉베드도 있습니다. 최소한 어린 트리케라톱스들은 소규모 무리를 지어 생활했을 가능성이 높습니다. 다만 성체가 된 이후에도 무리를 이루었는지는 아직 연구 중입니다. 지금 이 광경을 보십시오. 강가에 두 마리의 트리케라톱스가 나란히 물을 마시고 있습니다. 같은 종끼리의 이 미묘한 공존이, 6,600만 년 전의 삶이 단순히 생존만이 아니었음을 우리에게 귀띔해 줍니다.",
+      "visual_description": "강가에서 두 마리의 트리케라톱스(성체와 아성체)가 나란히 물을 마시는 장면. 강 수면에 반영된 모습. 멀리 배경에는 침엽수 숲과 구름이 드리운 하늘. 평화롭고 경이로운 분위기. 황혼 무렵의 붉은 노을.",
+      "image_prompt_en": "Photorealistic two Triceratops horridus an adult and subadult drinking from a Late Cretaceous river at sunset, paleontologically accurate, their reflections visible on calm water surface, BBC Prehistoric Planet style, 8K cinematic, conifer forest background, dramatic red and orange sunset sky, peaceful atmospheric mood, 16:9 cinematic composition, no cartoonish features",
+      "keywords": ["사회행동", "무리생활", "봉베드", "와이오밍", "몬태나", "어린 개체"]
+    },
+    {
+      "scene_id": "S05",
+      "narration_kr": "그러나 트리케라톱스의 삶이 언제나 평화롭지는 않았습니다. 같은 헬 크리크 층에서 함께 살았던 티라노사우루스 렉스는 트리케라톱스의 가장 강력한 천적이었습니다. 고생물학자들은 티라노사우루스가 트리케라톱스의 두개골을 물어 뜯어 머리를 몸통에서 분리한 흔적이 담긴 화석을 발굴했습니다. 영양분이 풍부한 목 근육에 접근하기 위해서였습니다. 하지만 트리케라톱스도 만만치 않았습니다. 1미터 길이의 뿔은 그 어떤 포식자에게도 치명적인 무기였습니다. 노스캐롤라이나 자연과학 박물관에 보관된 '듀얼링 다이노소어스' 표본에는 티라노사우루스와 트리케라톱스가 함께 발견되어, 두 종이 실제로 마주쳤음을 보여주는 극적인 증거로 남아 있습니다. 지금 이 장면, 트리케라톱스는 뿔을 낮추고, 프릴을 앞으로 향하며 몸을 굳힙니다. 뒤에서 다가오는 발소리를 향해. 이것이 백악기의 진짜 전투입니다.",
+      "visual_description": "트리케라톱스가 위협 자세 — 뿔을 낮추고 프릴을 앞으로 향한 채 땅을 발로 굴러 티라노사우루스에 대치하는 장면. 극적인 낮은 앵글. 배경은 황량한 헬 크리크 범람원, 먹구름. 두 공룡 사이의 긴장감이 느껴지는 구도.",
+      "image_prompt_en": "Photorealistic Triceratops horridus in defensive threat posture lowering horns and raising frill facing a Tyrannosaurus rex in a tense standoff on the Hell Creek floodplain, paleontologically accurate, BBC Prehistoric Planet style, 8K cinematic, dramatic low angle shot, stormy overcast sky, dusty dry floodplain environment, intense confrontation atmosphere, 16:9 cinematic composition, no cartoonish features",
+      "keywords": ["천적", "티라노사우루스", "대결", "방어", "헬 크리크", "듀얼링 다이노소어스"]
+    },
+    {
+      "scene_id": "S06",
+      "narration_kr": "트리케라톱스는 약 6,800만 년 전에 처음 등장하여, 소행성 충돌로 공룡 시대가 끝나는 바로 그 순간까지 살아남았습니다. 6,600만 년 전, 모든 비조류 공룡들이 지구에서 사라질 때, 트리케라톱스도 함께 역사 속으로 들어갔습니다. 그러나 그 유산은 화석으로 남아 지금 우리에게 이야기를 건넵니다. 2024년 발표된 성장 조직학 연구는 트리케라톱스가 매우 느리게 성장했으며 성체가 되기까지 수십 년이 걸렸음을 보여줍니다. 수십 년을 살아낸 이 생명체는, 어쩌면 백악기가 끝나는 그날까지 세상을 걸어다녔을지도 모릅니다. 트리케라톱스의 이야기는 여기서 끝나지 않습니다. 오늘도 어딘가의 지층 속에, 아직 발굴되지 않은 화석이 우리를 기다리고 있습니다. 다음 주, 공룡채널은 날카로운 발톱과 지성을 무기로 백악기의 초원을 누빈 또 다른 전사를 만납니다.",
+      "visual_description": "석양 속에 트리케라톱스 무리(성체 2마리, 어린 개체 1마리)가 지평선을 향해 걸어가는 실루엣 장면. 하늘은 붉고 황금빛. 카메라가 천천히 위로 올라가며 광활한 백악기의 대지가 펼쳐지는 엔딩 샷. 경이롭고 서사시적인 분위기.",
+      "image_prompt_en": "Photorealistic silhouette of three Triceratops horridus an adult pair and a juvenile walking toward the horizon at golden sunset, paleontologically accurate body proportions, BBC Prehistoric Planet style, 8K cinematic epic wide shot, dramatic red-gold sunset sky, vast Late Cretaceous lowland plain, aerial pull-back camera movement implied, emotional and majestic atmosphere, 16:9 cinematic composition, no cartoonish features",
+      "keywords": ["대멸종", "백악기 말", "화석", "성장", "유산", "엔딩"]
+    }
+  ],
+  "fact_summary": [
+    "트리케라톱스는 약 6,800만~6,600만 년 전 후기 백악기 북아메리카에 살았으며, 비조류 공룡 중 마지막까지 생존한 종 중 하나입니다.",
+    "2026년 도쿄대 연구팀은 CT 스캔으로 트리케라톱스 비강 내에 포유류·조류와 유사한 '호흡 터빈' 구조가 있음을 밝혀, 거대한 두개골의 체온·수분 조절 기능을 제안했습니다.",
+    "화석 대부분은 단독 개체로 발견되지만, 와이오밍의 '다넬 트리케라톱스 봉베드' 및 몬태나 어린 개체 3마리 봉베드는 적어도 어린 시절에는 소규모 사회적 행동을 했음을 시사합니다.",
+    "2024년 조직학 연구에 따르면 트리케라톱스는 매우 느리게 성장했으며, 성체가 되기까지 수십 년이 소요된 것으로 추정됩니다.",
+    "티라노사우루스가 트리케라톱스의 두개골을 분리해 목 근육을 먹은 흔적이 화석에서 발견되어, 두 종의 실제 포식-피식 관계가 확인되었습니다."
+  ],
+  "sources_note": "주요 화석 발견지: 헬 크리크 층(몬태나, 와이오밍, 사우스다코타 — 미국), 덴버 자연사 박물관, 스미소니언 자연사 박물관. 주요 연구: de Rooij et al. (2024) 조직학 분석(Cretaceous Research), 도쿄대 CT 스캔 비강 연구(The Anatomical Record, 2026), Naturalis Leiden — 다넬 봉베드 다학제 연구(2024). 듀얼링 다이노소어스 표본: 노스캐롤라이나 자연과학 박물관."
+}

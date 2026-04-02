@@ -1,0 +1,75 @@
+{
+  "week": 2,
+  "title_kr": "쐐기문자의 탄생 — 인류 최초의 문자",
+  "title_en": "Birth of Writing: Cuneiform",
+  "period": "BC 3200년경",
+  "region": "메소포타미아 (현재의 이라크 남부, 우루크)",
+  "hook": "오늘 밤, 당신은 지금 이 순간에도 누군가의 글을 읽고 있습니다. 하지만 그 첫 번째 글자는 어디서 시작되었을까요.",
+  "scenes": [
+    {
+      "scene_id": "S01",
+      "narration_kr": "티그리스 강과 유프라테스 강 사이. 두 강이 만들어낸 그 기름진 땅 위에, BC 3200년경의 우루크는 이미 세상에서 가장 크고 번성한 도시였습니다. 인구는 수만 명에 달했고, 신전은 하늘을 향해 솟아올라 있었으며, 시장에는 곡물과 기름, 가축이 끊임없이 오가고 있었습니다. 도시가 커질수록, 관리해야 할 것들도 많아졌습니다. 누가 얼마나 보냈는가. 누가 무엇을 받았는가. 인간의 기억은 그 방대한 거래를 담기에 너무 작았습니다. 그리고 그 한계 앞에서, 인류는 전혀 다른 해법을 찾기 시작합니다.",
+      "visual_description": "저녁 빛이 내려앉은 고대 우루크의 전경. 진흙 벽돌로 이루어진 신전과 시장, 강변을 따라 늘어선 창고들. 붉은 노을 아래 도시 전체가 거대하고 조용하게 빛나는 풍경.",
+      "image_prompt_en": "Photorealistic aerial view of ancient Mesopotamian city Uruk at golden hour, mud-brick ziggurats and warehouses along the Euphrates river, historically accurate Bronze Age architecture, warm golden atmospheric lighting, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["우루크", "메소포타미아", "BC 3200", "문명의 도시"]
+    },
+    {
+      "scene_id": "S02",
+      "narration_kr": "처음에는 점토로 만든 작은 토큰이었습니다. 양 한 마리는 작은 구슬 하나, 항아리 하나는 원뿔 모양 한 개. 상인들은 이 토큰들을 속이 빈 점토 공 안에 넣고 봉인했습니다. 보내는 물건의 수량을 그 안에 담아 함께 보낸 것입니다. 하지만 내용물을 확인하려면 공을 깨야 했습니다. 그래서 누군가가 생각했습니다. 봉인하기 전에, 표면에 토큰의 형태를 그려두면 어떨까. 그 단순한 발상이 모든 것을 바꿨습니다. 점토 공은 평평한 판으로 바뀌었고, 그림은 기호가 되었습니다.",
+      "visual_description": "낡은 나무 탁자 위에 놓인 고대 점토 토큰들과 봉인된 점토 공(불라). 흙빛과 갈색이 어우러진 조용한 클로즈업 장면. 따뜻한 촛불 빛.",
+      "image_prompt_en": "Photorealistic close-up of ancient clay tokens and sealed clay bullae on rough wooden surface, historically accurate Mesopotamian trade artifacts circa 3500 BCE, warm candlelight, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["점토 토큰", "불라", "원시 기록", "수메르 회계"]
+    },
+    {
+      "scene_id": "S03",
+      "narration_kr": "BC 3200년경, 우루크의 신전 서기관들은 새로운 도구를 손에 쥐었습니다. 갈대 줄기를 잘라 만든 끝이 뾰족한 첨필, 스틸러스. 그리고 강가에서 떠온 부드러운 점토. 서기관은 점토를 손 안에서 납작하게 눌러 작은 판을 만들었습니다. 그런 다음 스틸러스를 비스듬히 잡고, 그 끝을 점토 안으로 밀어 넣었습니다. 누르고, 방향을 돌리고, 다시 누르고. 그렇게 생겨난 자국은 쐐기 모양이었습니다. 라틴어로 '쿠네우스', 쐐기. 훗날 사람들은 이 문자를 '쐐기문자', 쿠네이폼이라 부르게 됩니다.",
+      "visual_description": "점토 서판 위에 갈대 스틸러스가 쐐기 모양 자국을 새기는 순간의 클로즈업. 아직 젖어 있는 점토 표면과 날카로운 자국들. 황금빛 촛불 조명.",
+      "image_prompt_en": "Photorealistic extreme close-up of a reed stylus pressing wedge-shaped cuneiform marks into moist clay tablet, fresh wet clay surface with sharp indentations, warm candlelight illumination, historically accurate ancient Mesopotamian scribal tools, painterly documentary style, 16:9 cinematic composition, no people, no hands, no faces, no cartoonish features",
+      "keywords": ["쐐기문자", "스틸러스", "점토 서판", "우루크"]
+    },
+    {
+      "scene_id": "S04",
+      "narration_kr": "처음 새겨진 기호들은 그림이었습니다. 소는 소의 머리 모양으로, 물고기는 물고기의 형태로. 하지만 그림만으로는 한계가 있었습니다. '2마리의 소가 북쪽에서 왔다'는 내용을 어떻게 표현할 것인가. 방향은, 숫자는, 동사는. 서기관들은 오랜 시간 고민하고 실험했습니다. 그리고 마침내 그림에서 소리로 넘어가는 발걸음을 떼었습니다. 기호가 사물이 아닌 음절을 표현하기 시작한 것입니다. 600개에 달하는 문자 체계가 완성되기까지는 수백 년이 걸렸습니다. 그것은 어느 한 사람의 발명이 아니었습니다. 수 세대에 걸친 서기관들의 지혜가 쌓인 결과였습니다.",
+      "visual_description": "고대 점토 서판 위에 새겨진 초기 상형 기호들과 점차 추상화되는 쐐기문자의 변천을 보여주는 여러 서판들. 돌 탁자 위 나란히 놓인 서판들, 따뜻한 빛.",
+      "image_prompt_en": "Photorealistic arrangement of multiple ancient clay tablets showing evolution from pictographic signs to abstract cuneiform script, historically accurate ancient Mesopotamian artifacts, stone table surface, warm atmospheric golden lighting, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["상형문자", "음절 문자", "문자 진화", "서기관"]
+    },
+    {
+      "scene_id": "S05",
+      "narration_kr": "서기관이 된다는 것은 어떤 의미였을까요. 에두바, '서판의 집'이라 불린 학교에서 소년들은 여덟 살 무렵부터 공부를 시작했습니다. 해 뜰 때부터 해 질 때까지. 스스로 점토를 이겨 서판을 만들고, 스스로 갈대를 잘라 스틸러스를 깎았습니다. 그리고 600개의 문자를 하나하나 외워야 했습니다. 잘못 새기면 매를 맞았습니다. 졸면 매를 맞았습니다. 지각해도 매를 맞았습니다. 당시의 기록은 전합니다. '하루도 빠짐없이, 선생님은 회초리를 들었다.' 그렇게 이십 년을 배워야 비로소 서기관이 될 수 있었습니다.",
+      "visual_description": "고대 수메르 에두바(서판의 집) 내부. 진흙 벽돌 교실 안에 줄지어 놓인 점토 서판들과 갈대 스틸러스. 창문으로 들어오는 부드러운 아침 빛.",
+      "image_prompt_en": "Photorealistic interior of ancient Sumerian scribal school edubba, rows of clay tablets and reed styluses on low mud-brick benches, morning light streaming through narrow window openings, historically accurate ancient Mesopotamian architecture, warm atmospheric lighting, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["에두바", "서기관 학교", "수메르 교육", "서판의 집"]
+    },
+    {
+      "scene_id": "S06",
+      "narration_kr": "문자가 생겨나자, 인간은 무엇을 기록했을까요. 처음에는 거래 장부였습니다. 보리 몇 가마, 기름 몇 항아리, 노동자 몇 명. 신전의 창고를 관리하는 행정 기록이 대부분이었습니다. 하지만 얼마 지나지 않아, 서기관들은 다른 것들도 새기기 시작했습니다. 왕의 전투. 신들의 이야기. 하늘의 움직임. 법령. 편지. 그리고 마침내 시(詩)도. 문자는 장부에서 시작했지만, 인간의 상상력을 담는 그릇이 되었습니다. 3,000년 후, 길가메시의 서사시는 이 점토 위에 새겨져 인류 최초의 문학 작품으로 남게 됩니다.",
+      "visual_description": "고대 신전 창고 내부, 수백 개의 점토 서판이 선반에 가지런히 정리된 모습. 행정 기록부터 문학까지, 다양한 크기와 형태의 서판들이 가득한 공간. 은은한 등불 조명.",
+      "image_prompt_en": "Photorealistic interior of ancient Mesopotamian temple archive, hundreds of clay tablets organized on mud-brick shelves, various sizes of cuneiform tablets from administrative records to literary works, historically accurate ancient storage room, warm oil lamp atmospheric lighting, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["서판 보관소", "신전 기록", "메소포타미아 문학", "기록 문화"]
+    },
+    {
+      "scene_id": "S07",
+      "narration_kr": "쐐기문자는 수메르에서 멈추지 않았습니다. 아카드인이 빌려 썼고, 바빌로니아인이 이어받았으며, 아시리아인이 발전시켰습니다. 엘람, 히타이트, 심지어 고대 페르시아까지. 서로 다른 언어를 가진 민족들이 같은 기호 체계로 서로의 생각을 주고받았습니다. 마치 오늘날 전 세계가 같은 알파벳을 사용하듯. 쐐기문자는 BC 75년경 마지막 흔적이 기록될 때까지, 무려 3,000년 이상 사용되었습니다. 인류 역사상 가장 오래 살아남은 문자 체계 가운데 하나입니다.",
+      "visual_description": "메소포타미아 지도를 배경으로, 수메르에서 페르시아까지 쐐기문자의 전파 경로를 나타내는 고대 지형. 양피지 느낌의 오래된 지도 위 강과 도시들, 따뜻한 황색 빛.",
+      "image_prompt_en": "Photorealistic ancient parchment map of Mesopotamia and the ancient Near East showing rivers Tigris and Euphrates, ancient city locations from Sumer to Persia, aged cartographic style, warm golden-sepia atmospheric lighting, historically accurate geography, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["쐐기문자 전파", "아카드", "바빌로니아", "고대 근동"]
+    },
+    {
+      "scene_id": "S08",
+      "narration_kr": "1872년, 영국의 학자 조지 스미스는 대영박물관의 창고에서 먼지 쌓인 서판 하나를 들여다보다 손을 멈췄습니다. 그가 해독한 내용은 성경의 홍수 이야기와 놀랍도록 닮아 있었습니다. 노아의 방주, 그 이야기보다 훨씬 오래된 기원이 이 점토 위에 새겨져 있었던 것입니다. 그는 너무나 흥분한 나머지, 박물관 한가운데서 옷을 벗어 던졌다는 일화가 전해집니다. 수메르의 서기관이 3,000년 전 새긴 그 쐐기 자국이, 19세기 한 학자의 심장을 뒤흔들었습니다. 문자란 그런 것입니다. 시간을 건너는 다리.",
+      "visual_description": "대영박물관 수장고 분위기의 공간. 어두운 조명 아래 석재 선반 위에 놓인 오래된 점토 서판. 길가메시 홍수 서판의 클로즈업. 희미하고 신비로운 빛.",
+      "image_prompt_en": "Photorealistic close-up of the ancient cuneiform Flood Tablet (Gilgamesh tablet XI) on museum display, dark atmospheric museum storage aesthetic, historically accurate clay tablet with dense cuneiform inscriptions, moody low-key lighting with spotlight, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["조지 스미스", "홍수 서판", "길가메시 서사시", "대영박물관"]
+    },
+    {
+      "scene_id": "S09",
+      "narration_kr": "오늘 밤, 당신이 읽고 있는 이 문장들도 결국 그 뿌리를 거슬러 올라가면, 어느 이름 모를 수메르 서기관의 손끝에 닿습니다. 그는 신전 창고의 기름 몇 항아리를 기록하려 점토를 집어 들었을 것입니다. 잠자리에 들기 전 오늘 하루를 남기려 했을 수도 있고, 어쩌면 그냥 무언가를 표현하고 싶었을 수도 있습니다. 이유는 알 수 없습니다. 하지만 그 첫 번째 자국이 세상을 바꿨습니다. 기억은 사라지지만, 새겨진 것은 남습니다. 오늘 밤, 잠들기 전에 그것을 기억해 주십시오. 인간이 처음으로 점토 위에 마음을 새긴 그 순간을.",
+      "visual_description": "밤하늘 아래, 티그리스 강가에 놓인 작은 점토 서판 하나. 별빛이 서판 위 쐐기 자국을 희미하게 비추고, 강물 소리만 흐른다. 조용하고 명상적인 마지막 장면.",
+      "image_prompt_en": "Photorealistic solitary clay tablet with cuneiform inscriptions resting on riverbank sand at night, starlit sky reflection in Tigris river water, historically accurate ancient Mesopotamian setting, deep blue night sky with stars, soft moonlight illumination, painterly documentary style, 16:9 cinematic composition, no people, no faces, no cartoonish features",
+      "keywords": ["쐐기문자의 유산", "역사의 시작", "티그리스 강", "문자의 탄생"]
+    }
+  ],
+  "episode_summary": "BC 3200년, 메소포타미아 우루크에서 인류 최초의 문자 쐐기문자가 탄생하기까지 — 점토 토큰에서 600자 체계로 진화한 문자의 여정과 그것이 인류 문명에 남긴 3,000년의 유산.",
+  "sources_note": "World History Encyclopedia - Cuneiform (worldhistory.org); Wikipedia - Cuneiform; Archaeology.org - The World's Oldest Writing (2025); Metropolitan Museum of Art - Origins of Writing; Schmandt-Besserat, D. - The Evolution of Writing (UT Austin); British Museum records on Flood Tablet / George Smith 1872"
+}

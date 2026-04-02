@@ -1,75 +1,142 @@
 {
   "week": 1,
-  "title_kr": "수메르, 도시가 태어나는 새벽",
-  "title_en": "Sumer: Dawn of the First Cities",
-  "period": "기원전 4500년경~기원전 1900년경",
-  "region": "메소포타미아 남부, 오늘날 이라크 남부",
-  "hook": "강이 남기고 간 진흙 위에, 인류는 처음으로 도시라는 꿈을 세웁니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+  "title_kr": "문명의 새벽 — 수메르, 최초의 도시들",
+  "title_en": "Dawn of Civilization: Sumer and the First Cities",
+  "period": "BC 4500년경 ~ BC 3000년경",
+  "region": "메소포타미아 (현재 이라크 남부)",
+  "hook": "강이 두 줄기 흐르는 땅이 있었다. 그 사이, 인류는 처음으로 '함께 사는 법'을 배웠다.",
   "scenes": [
     {
       "scene_id": "S01",
-      "narration_kr": "아주 오래된 새벽입니다. 티그리스와 유프라테스가 천천히 흘러갑니다. 두 강 사이의 낮은 땅에는 아직 거대한 제국도, 돌로 쌓은 성벽도 없습니다. 대신 젖은 흙냄새가 있습니다. 갈대가 바람에 스치고, 진흙 벽돌을 말리는 사람들의 손길이 있습니다. 사람들은 해마다 범람하는 강을 두려워하면서도, 그 강이 남겨 놓는 비옥한 흙을 놓치지 않습니다. 그리고 바로 이곳, 메소포타미아 남부의 평원에서, 인류는 처음으로 함께 모여 오래 사는 방법을 배워 갑니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "동틀 무렵의 메소포타미아 평원, 두 강 사이 습지와 갈대밭, 진흙 벽돌을 말리는 초기 정착민들의 모습",
-      "image_prompt_en": "Photorealistic dawn over southern Mesopotamia wetlands between the Tigris and Euphrates, early Sumerian settlers shaping and drying mud bricks near reed marshes, historically accurate clothing and landscape, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["수메르", "메소포타미아"]
+      "narration_kr": "지금으로부터 약 6천 5백 년 전.\n\n두 강이 바다를 향해 나란히 흐르고 있었습니다.\n티그리스. 그리고 유프라테스.\n\n지금의 이라크 남부, 그 비옥한 범람원 위에, 인류는 처음으로 씨앗을 심기 시작했습니다.\n\n처음엔 작은 마을이었습니다. 지붕 낮은 집 몇 채, 작은 신전 하나, 그리고 강물을 끌어들이는 좁은 수로.\n\n그런데 그 수로가 모든 것을 바꾸었습니다.\n\n물을 나누어 쓰려면 규칙이 필요했고, 규칙을 만들려면 사람이 모여야 했습니다. 그렇게 사람들이 모이고, 또 모이면서, 어느 날 그 마을은 도시가 되어 있었습니다.\n\n이것이 수메르의 이야기입니다. 인류가 처음으로 '문명'이라고 부를 수 있는 무언가를 만들어낸 땅의 이야기입니다.",
+      "visual_description": "황금빛 일출 아래 티그리스-유프라테스 강 전경. 초기 농경 정착지의 흙벽돌 집들이 강가에 점점이 흩어져 있다. 좁은 관개 수로가 대추야자 숲 사이로 이어진다. 원경에 수메르 평원의 광활한 모습.",
+      "image_prompt_en": "Photorealistic aerial view of ancient Mesopotamia at golden sunrise, twin rivers Tigris and Euphrates flowing through flat fertile plains, small mud-brick settlements scattered along the riverbank, narrow irrigation canals cutting through date palm groves, historically accurate early Sumerian landscape BC 4500, painterly documentary style, warm atmospheric golden hour lighting, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "메소포타미아",
+        "티그리스",
+        "유프라테스",
+        "농경",
+        "수메르"
+      ]
     },
     {
       "scene_id": "S02",
-      "narration_kr": "처음부터 왕이 있는 나라는 아닙니다. 먼저 마을이 있습니다. 물길을 내고, 둑을 고치고, 곡식을 나누는 일이 생깁니다. 한 사람이 할 수 없는 일이 늘어나자, 사람들은 가까이 살아야 한다는 사실을 깨닫습니다. 이렇게 마을은 커지고, 커진 마을은 마침내 도시가 됩니다. 우루크와 우르, 라가시 같은 이름들이 조용히 역사 속에 모습을 드러냅니다. 도시는 단지 많은 집이 아닙니다. 사람들의 노동과 기억, 믿음과 두려움이 한곳에 모이는 새로운 삶의 방식입니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "관개 수로를 정비하는 주민들, 점차 커지는 진흙 벽돌 마을과 초기 도시의 전경",
-      "image_prompt_en": "Photorealistic early Sumerian town growing into a city, villagers digging irrigation canals and repairing embankments, mud-brick homes spreading across a flat Mesopotamian plain, historically accurate architecture and dress, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["도시국가", "관개"]
+      "narration_kr": "수메르 사람들이 처음 이 땅에 나타났을 때, 이곳은 가혹한 곳이었습니다.\n\n여름이면 기온이 섭씨 오십 도를 넘어섰고, 강은 해마다 예고 없이 범람하여 모든 것을 쓸어갔습니다. 먹을 것을 얻으려면, 자연을 그대로 받아들여서는 살 수 없었습니다.\n\n그래서 그들은 수로를 팠습니다.\n강물이 마르기 전에 밭으로 물을 끌어오고, 홍수가 오기 전에 둑을 쌓았습니다.\n\n혼자서는 할 수 없는 일이었습니다. 수백 명이, 때로는 수천 명이 함께 움직여야 했습니다. 그 협동이 씨앗이 되었습니다.\n\n여분의 식량이 쌓였고, 어떤 사람들은 농사 대신 다른 일을 할 수 있게 되었습니다. 도공, 목수, 상인, 그리고 신전을 관리하는 사제들.\n\n직업이 나뉘는 순간, 사회가 탄생했습니다.",
+      "visual_description": "수메르 평원에서 관개 수로를 따라 흐르는 물줄기. 진흙 제방과 야자수 그림자가 수면에 어린다. 보리밭이 수로 옆으로 황금빛으로 펼쳐진다.",
+      "image_prompt_en": "Photorealistic ancient Mesopotamian irrigation canal carved through dry cracked earth, stone and mud-brick embankments lining the channel, date palms reflected in the flowing water, golden barley fields alongside the canal, early Sumerian agricultural landscape BC 4000, historically accurate, warm atmospheric afternoon light, painterly documentary style, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "관개",
+        "협동",
+        "분업",
+        "농경사회",
+        "수메르"
+      ]
     },
     {
       "scene_id": "S03",
-      "narration_kr": "수메르의 도시를 움직이는 힘은 돌이 아니라 물입니다. 비가 넉넉하지 않은 땅에서, 물은 하늘이 아니라 사람의 손으로 다스려야 하는 선물이 됩니다. 누군가는 수로를 파고, 누군가는 둑을 쌓고, 누군가는 물이 어느 밭으로 먼저 들어갈지 정해야 합니다. 이 작은 결정들이 쌓여 질서가 됩니다. 그리고 질서는 권력이 됩니다. 수메르의 도시국가는 이렇게 자연과 싸워 이기기보다, 자연의 변덕을 함께 견디는 과정 속에서 태어납니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "넓은 평원 위 관개 수로와 둑, 물의 흐름을 살피는 관리와 농민들",
-      "image_prompt_en": "Photorealistic Sumerian irrigation network across a dry alluvial plain, farmers and overseers directing canal water into fields, earthen levees and waterways under golden light, historically accurate tools and dress, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["수로", "농업"]
+      "narration_kr": "기원전 4000년 무렵, 유프라테스 강이 휘어지는 곳에 한 도시가 일어났습니다.\n\n우루크.\n\n오늘날의 고고학자들은 이 도시를 인류 역사상 최초의 진정한 도시라고 부릅니다.\n\n기원전 3000년 무렵, 우루크의 인구는 4만 명에 달했습니다. 그 주변에 사는 사람들까지 합치면 8만에서 9만 명. 당시 지구상에서 가장 많은 사람이 모여 사는 곳이었습니다.\n\n성벽의 둘레가 9킬로미터.\n\n성벽 안에는 시장이 있었고, 신전이 있었고, 하늘을 향해 솟아오르는 거대한 탑이 있었습니다.\n\n누군가가 그 탑 꼭대기에 서서 도시를 내려다보았을 때, 그는 무슨 생각을 했을까요.\n\n어쩌면 그는, 자신이 보는 것이 얼마나 경이로운 일인지를 미처 알지 못했을지도 모릅니다. 인류가 처음으로 만들어낸 도시라는 것을.",
+      "visual_description": "기원전 3000년경 우루크 도시의 전경. 진흙벽돌로 쌓인 두꺼운 성벽이 도시를 에워싸고, 중앙에 여러 단으로 올라간 지구라트가 석양을 배경으로 웅장하게 솟아 있다.",
+      "image_prompt_en": "Photorealistic ancient city of Uruk Mesopotamia seen from above at sunset, massive mud-brick city walls encircling dense urban settlement, central ziggurat temple tower rising in stepped tiers against orange sky, narrow streets and flat-roofed houses within the walls, historically accurate BC 3000 Sumerian architecture, painterly documentary style, warm atmospheric sunset lighting, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "우루크",
+        "최초의 도시",
+        "성벽",
+        "지구라트",
+        "BC 3000"
+      ]
     },
     {
       "scene_id": "S04",
-      "narration_kr": "도시의 한가운데에는 높은 신전이 서기 시작합니다. 훗날 지구라트로 이어지는 그 높은 구조물의 앞에서 사람들은 하늘과 땅이 이어져 있다고 믿습니다. 신은 멀리 있지만, 신전은 늘 눈앞에 있습니다. 곡식은 창고에 쌓이고, 제사는 계절을 따라 이어집니다. 사제는 단지 기도를 올리는 사람이 아니라, 도시의 시간을 정리하고 물자를 관리하는 사람으로도 보입니다. 수메르에서 신앙은 마음의 문제이면서 동시에 도시 운영의 질서이기도 합니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "도시 중심의 초기 신전 단지, 제물을 드리는 사람들과 곡식 창고, 신전을 올려다보는 주민들",
-      "image_prompt_en": "Photorealistic early Sumerian temple complex at the center of a city, worshippers bringing offerings and grain to temple storerooms, priests overseeing rituals, historically accurate mud-brick sacred architecture, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["신전", "지구라트"]
+      "narration_kr": "수메르인들은 자신들의 첫 번째 도시가 우루크가 아니라, 에리두라고 믿었습니다.\n\n에리두. 신들이 처음 땅 위에 세운 도시.\n\n수메르의 신화에 따르면, 지혜와 물의 신 엔키가 태초의 바다에서 땅을 건져 올려 에리두를 세웠다고 합니다. 그리고 그곳에 '메(meh)'라고 불리는 문명의 법칙들을 내려주었다고 합니다. 왕권, 신관직, 글쓰기, 음악, 진실, 그리고 거짓까지도.\n\n학자들은 에리두의 신화를 성경의 에덴동산과 비교하기도 합니다. 인류가 처음 시작된 곳, 신과 인간이 가장 가까웠던 시절의 기억.\n\n에리두의 발굴 현장에는 신전 하나가 있었습니다. 그 신전은 수천 년에 걸쳐 열여덟 번 새로 지어진 흔적이 남아 있었습니다.\n\n같은 자리에, 같은 방향으로, 세대를 넘어 계속해서.\n\n누군가 이 땅이 신성하다고 믿었고, 그 믿음을 자식에게 물려주었고, 자식은 또 그 믿음을 이어받았습니다.",
+      "visual_description": "에리두 신전 발굴지. 수천 년에 걸쳐 층층이 쌓인 신전의 유적이 드러나 있다. 사막 황혼빛 아래 가장 오래된 점토 벽돌 기초가 노출되어 있다. 그 위로 별이 하나둘 떠오른다.",
+      "image_prompt_en": "Photorealistic archaeological excavation site of ancient Eridu Sumer, layered mud-brick temple foundations exposed in stratified cross-section showing 18 rebuilding phases, flat desert landscape at dusk with early stars appearing, historically accurate Sumerian temple architecture BC 5000, painterly documentary style, warm amber twilight atmospheric lighting, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "에리두",
+        "엔키",
+        "신화",
+        "에덴동산",
+        "신전"
+      ]
     },
     {
       "scene_id": "S05",
-      "narration_kr": "사람이 많아질수록, 기억만으로는 도시를 다스릴 수 없습니다. 누가 얼마의 곡식을 바쳤는지, 어느 창고에 보리가 남아 있는지, 어떤 땅에 물을 돌렸는지를 기록해야 합니다. 그래서 진흙판 위에 작은 흔적이 남기기 시작합니다. 처음에는 물건을 세기 위한 표시였을지 모릅니다. 그러나 그 표시는 점점 더 많은 뜻을 품습니다. 쐐기문자라 불리게 될 이 기록의 습관은, 말이 사라진 뒤에도 생각이 남을 수 있다는 놀라운 가능성을 엽니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "젖은 점토판에 갈대 펜으로 표식을 새기는 서기, 창고와 행정 기록 장면",
-      "image_prompt_en": "Photorealistic Sumerian scribe pressing reed stylus marks into a wet clay tablet inside a temple storehouse, baskets of grain and administrative goods nearby, historically accurate writing tools and setting, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["쐐기문자", "기록"]
+      "narration_kr": "도시가 커지면서, 새로운 문제가 생겨났습니다.\n\n누가, 누구에게, 얼마나 많은 보리를 주어야 하는가.\n누가, 몇 마리의 양을 신전에 바쳤는가.\n이 땅은 누구의 것인가.\n\n사람들은 기억만으로는 모든 것을 다 담을 수 없다는 사실을 깨달았습니다. 그리고 그 깨달음에서, 인류 역사상 가장 위대한 발명 중 하나가 탄생했습니다.\n\n글. 쓰는 것.\n\n기원전 3600년 무렵, 우루크의 신전 창고에서 일하던 서기관들이 축축한 점토판 위에 갈대 줄기로 눌러 기호를 새기기 시작했습니다.\n\n처음에는 단순한 기록이었습니다. 물고기 서른 마리, 보리 스무 자루.\n\n하지만 그 단순한 흠집에서, 언젠가는 시가 나왔고, 법이 나왔고, 역사가 나왔습니다.\n\n인류가 처음 기억을 땅에 새긴 날이었습니다.",
+      "visual_description": "기원전 3600년경의 쐐기문자 점토판들. 갈대 줄기로 새긴 상형 기호들이 구운 점토 표면에 선명하게 남아 있다. 기름 등잔 불빛이 기호들 위에 어른거린다.",
+      "image_prompt_en": "Photorealistic close-up of ancient Sumerian clay tablets with early pictographic cuneiform inscriptions, reed stylus marks pressed deep into unfired clay surface, oil lamp warm flickering light casting dramatic shadows across the carved symbols, historically accurate BC 3600 Uruk writing materials, painterly documentary style, warm candlelight atmospheric lighting, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "문자",
+        "쐐기문자",
+        "점토판",
+        "서기관",
+        "BC 3600"
+      ]
     },
     {
       "scene_id": "S06",
-      "narration_kr": "이제 도시는 서로를 의식합니다. 더 넓은 밭, 더 안정된 물길, 더 많은 노동력과 더 큰 신전. 이런 것들을 두고 도시와 도시가 경쟁합니다. 때로는 교역하고, 때로는 충돌합니다. 수메르의 세계는 하나의 나라라기보다, 서로 닮았지만 끝내 하나가 되지 않는 도시들의 모임에 가깝습니다. 그래서 그들의 역사는 늘 가까운 이웃과의 협상, 긴장, 그리고 자존심의 역사이기도 합니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "성벽과 운하를 사이에 둔 여러 수메르 도시국가, 교역 행렬과 긴장감 있는 대치 장면",
-      "image_prompt_en": "Photorealistic rival Sumerian city-states across canals and open plains, merchants with donkey caravans and armed retainers near mud-brick walls, historically accurate early urban Mesopotamian setting, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["도시국가", "교역"]
+      "narration_kr": "수메르의 도시들은 하나가 아니었습니다.\n\n우루크, 우르, 라가시, 니푸르, 키시, 움마.\n\n각 도시에는 각자의 수호신이 있었고, 각자의 왕이 있었고, 각자의 자존심이 있었습니다.\n\n그리고 그 자존심들이 부딪혔습니다.\n\n기원전 2700년 무렵, 메소포타미아의 도시들 사이에 처음으로 기록된 전쟁이 벌어졌습니다. 키시의 왕 엔메바라게시가 동쪽의 엘람을 상대로 전쟁을 선포한 것입니다.\n\n그것이 기록된 역사상 최초의 전쟁입니다.\n\n전쟁이 오면, 도시는 지도자가 필요했습니다. 사람들은 광장에 모여 한 사람을 뽑았습니다. 루갈(LUGAL) — '큰 사람'. 왕이라는 개념이 탄생하는 순간이었습니다.\n\n그러나 전쟁이 끝나면, 루갈의 권력도 함께 끝나는 것이 원칙이었습니다. 처음에는.",
+      "visual_description": "수메르 도시국가의 성벽과 성문. 두터운 진흙벽돌 성벽이 황야를 향해 뻗어 있고, 새벽빛이 성벽을 물들인다. 멀리 지평선 위로 다른 도시의 실루엣이 희미하게 보인다.",
+      "image_prompt_en": "Photorealistic ancient Sumerian city-state defensive walls made of massive mud-brick construction, decorated gateway with recessed niches and pilasters typical of Sumerian architecture, arid plain extending to horizon, silhouette of distant rival city barely visible, historically accurate BC 2700 Mesopotamia, painterly documentary style, cool blue-grey pre-dawn atmospheric lighting, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "도시국가",
+        "전쟁",
+        "루갈",
+        "왕권",
+        "키시"
+      ]
     },
     {
       "scene_id": "S07",
-      "narration_kr": "수메르 사람들도 자신들의 영웅을 이야기합니다. 그 가운데 가장 오래 남는 이름 하나가 길가메시입니다. 그는 우루크의 왕으로 전해지며, 강한 힘과 깊은 두려움을 함께 지닌 인물로 그려집니다. 친구의 죽음 앞에서 흔들리고, 인간이 피할 수 없는 운명을 묻습니다. 이 이야기는 단순한 전설을 넘어, 아주 오래전 사람들 역시 사랑과 상실, 삶의 짧음을 알고 있었다는 사실을 들려줍니다. 수메르의 점토판은 도시의 회계만이 아니라 인간의 마음도 함께 기록합니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "성벽 위에서 도시를 바라보는 길가메시의 상징적 장면, 서사시적 분위기의 우루크",
-      "image_prompt_en": "Photorealistic symbolic scene of Gilgamesh overlooking the city of Uruk from massive mud-brick walls, epic yet introspective atmosphere, historically grounded Sumerian urban landscape, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["길가메시", "우루크"]
+      "narration_kr": "수메르의 도시 한 가운데에는 늘 지구라트가 있었습니다.\n\n계단식으로 쌓아 올린 거대한 흙벽돌 탑. 그 꼭대기에는 신의 집이라 불리는 신전이 있었습니다.\n\n수메르인들은 신이 하늘과 땅 사이 어딘가에 산다고 믿었습니다. 그래서 탑을 높이 쌓았습니다. 신에게 조금 더 가까이 닿기 위해.\n\n도시마다 수호신이 달랐습니다. 우루크에는 사랑과 전쟁의 여신 이난나. 우르에는 달의 신 난나. 에리두에는 지혜의 신 엔키.\n\n신전은 단순한 종교 시설이 아니었습니다. 신전에는 창고가 있었고, 서기관이 있었고, 식량을 나누어 주는 관리가 있었습니다.\n\n신전이 곧 은행이었고, 신전이 곧 정부였습니다.\n\n사제는 신의 대리인이자, 도시의 통치자였습니다. 하늘과 땅을 연결하는 사람이었습니다.",
+      "visual_description": "우르의 지구라트를 석양빛이 감싸는 모습. 여러 단으로 올라간 거대한 진흙벽돌 계단식 탑이 주황빛 노을을 배경으로 위용을 드러낸다.",
+      "image_prompt_en": "Photorealistic Great Ziggurat of Ur at golden sunset, massive stepped mud-brick temple tower with recessed buttresses on each terrace level, ramp staircases leading to the summit shrine, ancient Sumerian architecture circa BC 2100, historically accurate reconstruction, painterly documentary style, deep orange warm atmospheric sunset lighting, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "지구라트",
+        "이난나",
+        "난나",
+        "엔키",
+        "신전국가"
+      ]
     },
     {
       "scene_id": "S08",
-      "narration_kr": "하지만 어떤 도시도 영원하지 않습니다. 강의 흐름은 바뀌고, 땅은 소금을 머금으며, 전쟁은 사람을 지치게 합니다. 바깥에서 온 세력은 수메르의 세계를 흔들고, 안에서는 오래된 질서가 조금씩 힘을 잃어 갑니다. 시간이 지나며 아카드와 바빌로니아 같은 새로운 이름들이 무대에 오릅니다. 그럼에도 수메르가 사라졌다고 말하기는 어렵습니다. 도시를 운영하는 법, 기록을 남기는 법, 신전과 행정이 엮이는 방식은 이후의 문명 속으로 깊이 스며들기 때문입니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "쇠퇴해 가는 수메르 도시의 운하와 염분이 낀 들판, 멀리 다가오는 새로운 세력의 행렬",
-      "image_prompt_en": "Photorealistic declining Sumerian city with silting canals and salt-streaked fields, weary inhabitants and distant approaching foreign powers, historically accurate late Bronze Age Mesopotamian atmosphere, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["쇠퇴", "아카드"]
+      "narration_kr": "수메르인들은 바퀴를 발명했습니다. 돛단배를 만들었습니다. 수학을 발전시켰고, 시간을 60진법으로 나누었습니다.\n\n오늘날 우리가 한 시간을 60분으로, 1분을 60초로 나누는 것은, 6천 년 전 수메르의 서기관들이 만든 셈법에서 비롯된 것입니다.\n\n그들은 또 학교를 만들었습니다. '에두바(Edubba)' — 점토판의 집. 학생들은 여러 해 동안 점토판 위에 글자를 연습하며 서기관이 되는 법을 배웠습니다.\n\n어떤 점토판에는 학생의 낙서가 남아 있습니다. 선생님 욕, 숙제가 많다는 투정, 친구 이름.\n\n6천 년이 지나도, 학생은 학생이었습니다.\n\n수메르인들은 또 맥주를 빚었습니다. 세계에서 가장 오래된 맥주 레시피가 수메르의 점토판에 새겨져 있습니다. 그것은 여신 닌카시에게 바치는 찬가이자 레시피였습니다.",
+      "visual_description": "수메르 문명의 발명품 유물들. 나무 바퀴의 초기 형태, 수학 계산이 새겨진 점토판, 맥주 제조를 묘사한 원통형 인장의 롤링 자국이 따뜻한 박물관 조명 아래 나란히 놓여 있다.",
+      "image_prompt_en": "Photorealistic arrangement of ancient Sumerian artifacts on a stone surface, early wooden wheel fragment, clay tablets with mathematical calculations and astronomical records, cylinder seal impression showing brewery scene, historically accurate BC 3000-2000 Mesopotamian objects, museum-style warm spotlighting, painterly documentary style, warm atmospheric lighting, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "바퀴",
+        "60진법",
+        "에두바",
+        "맥주",
+        "닌카시"
+      ]
     },
     {
       "scene_id": "S09",
-      "narration_kr": "잠들기 전 이 오래된 도시들을 다시 떠올려 봅니다. 수메르는 가장 화려한 제국으로 시작하지 않습니다. 그들은 먼저 물을 다스리려 했고, 곡식을 저장하려 했고, 함께 살아갈 규칙을 만들려 했습니다. 아주 소박해 보이는 이 노력 속에서 인류 문명의 핵심이 태어납니다. 도시, 기록, 제도, 그리고 집단의 기억. 우리가 오늘 너무도 당연하게 여기는 많은 것들이, 사실은 이 진흙의 땅에서 천천히 시작되고 있습니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-      "visual_description": "해질녘 황금빛 아래 펼쳐진 수메르 도시의 전경, 운하와 신전, 집들이 조용히 보이는 마무리 장면",
-      "image_prompt_en": "Photorealistic sunset panorama of a Sumerian city with canals, temple precinct, and clustered mud-brick homes fading into evening light, historically accurate Mesopotamian setting, cinematic 16:9 composition, painterly documentary style, warm atmospheric lighting, no cartoonish features",
-      "keywords": ["문명", "유산"]
+      "narration_kr": "기원전 3000년에서 2000년 사이, 수메르의 도시들은 끊임없이 서로 싸웠습니다.\n\n패권은 우루크에서 키시로, 키시에서 우르로, 우르에서 라가시로 넘어갔습니다.\n\n그리고 기원전 2334년 무렵, 북쪽에서 한 사람이 내려왔습니다. 아카드의 사르곤.\n\n그는 수메르의 모든 도시국가들을 하나씩 정복해 나갔습니다. 세계 최초의 제국이 세워지는 순간이었습니다.\n\n그러나 수메르의 문화는 정복당하지 않았습니다. 아카드는 수메르의 글자를 썼고, 수메르의 신들을 섬겼습니다. 정복자가 피정복자의 문명을 흡수한 것입니다.\n\n수메르의 마지막 왕조, 우르 제3왕조가 기원전 2004년에 멸망하고 수메르라는 이름은 역사에서 사라졌습니다.\n\n하지만 그들이 남긴 것들은 사라지지 않았습니다.",
+      "visual_description": "고대 메소포타미아 지도의 석판 부조. 수메르 도시들의 위치가 탑 모양으로 새겨져 있고, 아카드 정복의 흐름이 물결 무늬로 표현된다. 황혼빛이 석판 위를 물들인다.",
+      "image_prompt_en": "Photorealistic ancient carved stone map relief showing Mesopotamian river valleys and city locations, Tigris and Euphrates rivers etched in deep relief, ancient city markers indicated by small tower symbols, Akkadian conquest arrows rendered as carved stone waves, historically accurate BC 2334 era cartography style, warm amber torch-light atmospheric lighting, painterly documentary style, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "아카드",
+        "사르곤",
+        "제국",
+        "우르 3왕조",
+        "문명 계승"
+      ]
+    },
+    {
+      "scene_id": "S10",
+      "narration_kr": "오늘날, 그 모든 것이 시작된 땅, 이라크 남부의 사막 어딘가에 우루크의 흔적이 남아 있습니다.\n\n가장 오래된 층은 아직 발굴되지 않고 모래 아래 잠들어 있습니다.\n\n우리가 쓰는 60분, 우리가 나누는 시간, 우리가 올려다보는 별자리 이름들 중에는 수메르인들이 붙인 것들이 있습니다.\n\n그들은 스스로를 '검은 머리 사람들'이라고 불렀습니다. 자신들이 어디서 왔는지는 오늘날까지도 정확히 알려져 있지 않습니다.\n\n다만 우리가 아는 것은, 그들이 강과 강 사이의 땅에서, 씨앗을 심고, 수로를 파고, 탑을 쌓고, 점토판에 기억을 새기며, 인류가 함께 사는 법을 처음으로 발명했다는 것입니다.\n\n그 발명이, 지금 이 순간 우리가 살아가는 세계의 시작이었습니다.\n\n오늘 밤, 잠들기 전, 잠깐만 생각해 보십시오.\n\n6천 5백 년 전, 두 강 사이의 땅에서 첫 불을 밝힌 그 사람들을.",
+      "visual_description": "달빛 아래 이라크 남부의 우루크 발굴지. 끝없이 펼쳐진 고요한 사막 위로 쏟아지는 별들. 지평선 너머로 희미하게 보이는 발굴 흔적의 흙무더기들. 두 강이 멀리서 달빛을 받아 반짝인다.",
+      "image_prompt_en": "Photorealistic night landscape of ancient Uruk archaeological site in southern Iraqi desert, brilliant Milky Way stars filling the dark sky above vast flat plains, low silhouette of excavated mounds on the horizon, two distant river reflections of moonlight barely visible, historically accurate Mesopotamian terrain, painterly documentary style, cool moonlight atmospheric lighting with deep blue-black sky, no people, no faces, no cartoonish features, 16:9 cinematic composition",
+      "keywords": [
+        "검은 머리 사람들",
+        "우루크 유적",
+        "인류 유산",
+        "여운",
+        "문명의 시작"
+      ]
     }
   ],
-  "episode_summary": "두 강 사이의 진흙 땅에서, 인류 최초의 도시와 기록, 그리고 문명의 질서가 어떻게 태어나는지 따라가는 에피소드입니다. ", [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
-  "sources_note": "기본 에피소드 주제와 기간은 Space 제공 일정표 52weeks_history.csv의 1주차 ‘Sumer’ 항목을 바탕으로 구성했습니다. 세부 서술은 일반적으로 알려진 수메르 문명사의 흐름을 따르며, 도시국가·관개·신전·쐐기문자·길가메시 서사는 대표적 학설과 전승에 근거한 서술입니다. " [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/collection_061c8d53-f24f-49de-b3aa-f8412919f45a/6a5ae364-9970-48fe-a119-48e44725df59/52weeks_history.csv)
+  "episode_summary": "인류 최초의 문명 수메르 — 두 강 사이에서 도시, 문자, 법, 학교를 탄생시킨 '검은 머리 사람들'의 이야기.",
+  "sources_note": "World History Encyclopedia (worldhistory.org) — 'Sumer', 'Uruk', 'Sumerians', 'Mesopotamia: The Rise of the Cities'; Britannica 'Sumer'; History of Sumer (Wikipedia); 고고학적 연대 및 인구 추정은 학자마다 이견 있음 (BC 4500~4000 도시 출현 시기 포함)"
 }
