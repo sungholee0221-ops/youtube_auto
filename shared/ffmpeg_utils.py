@@ -335,6 +335,7 @@ def create_channel_video(
     image_durations: list[int],
     fadeout_sec: int = 0,
     black_screen_sec: int = 0,
+    transition_sec: int = 0,
 ) -> str:
     """채널 공통 영상 합성.
 
@@ -343,6 +344,7 @@ def create_channel_video(
 
     fadeout_sec    : 슬라이드쇼 끝 페이드아웃 초 (0=없음, 채널3=3)
     black_screen_sec: 슬라이드쇼 뒤 검은화면 초 (0=없음, 채널3=3000)
+    transition_sec : 오프닝→슬라이드쇼 전환 페이드 초 (0=없음, 기본 2)
     """
     import tempfile
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -367,10 +369,15 @@ def create_channel_video(
         list_file    = os.path.join(tmp, "images.txt")
 
         # 1. 오프닝 → 영상 트랙 (1920x1080, 24fps, yuv420p)
+        opening_dur = probe_duration(opening_path)
+        opening_vf = ("scale=1920:1080:force_original_aspect_ratio=decrease,"
+                      "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24")
+        if transition_sec > 0:
+            fade_st = max(0, opening_dur - transition_sec)
+            opening_vf += f",fade=t=out:st={fade_st:.2f}:d={transition_sec}"
         _run_ffmpeg([
             "-i", opening_path,
-            "-vf", ("scale=1920:1080:force_original_aspect_ratio=decrease,"
-                    "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24"),
+            "-vf", opening_vf,
             "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
             "-pix_fmt", "yuv420p", "-an", "-y", opening_v,
         ], desc="opening_video")
@@ -399,9 +406,11 @@ def create_channel_video(
             "-y", full_audio,
         ], desc="concat_audio")
 
-        # 5. 이미지 슬라이드쇼 (이미지별 duration, 선택 페이드아웃)
+        # 5. 이미지 슬라이드쇼 (이미지별 duration, 선택 페이드인/아웃)
         vf = ("scale=1920:1080:force_original_aspect_ratio=decrease,"
               "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24")
+        if transition_sec > 0:
+            vf += f",fade=t=in:st=0:d={transition_sec}"
         if fadeout_sec > 0:
             fade_st = max(0, slideshow_dur - fadeout_sec)
             vf += f",fade=t=out:st={fade_st}:d={fadeout_sec}"

@@ -135,6 +135,7 @@ def main():
             image_durations=image_durations,
             fadeout_sec=0,
             black_screen_sec=black_screen_sec,
+            transition_sec=2,
         )
 
         capture_thumbnail(tmp_video, tmp_thumb)
