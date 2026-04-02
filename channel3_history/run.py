@@ -127,6 +127,7 @@ def main():
 
         # 이미지 표시 시간 = 씬 TTS 길이 + pause
         image_durations = [round(d + SCENE_PAUSE) for d in scene_durations]
+        image_durations[0] += 1  # 첫 씬: 오디오 1초 여유에 맞춰 표시 시간 연장
 
         tts_total = sum(scene_durations) + SCENE_PAUSE * len(scene_durations)
         logger.info(f"TTS 합계: {sum(scene_durations):.1f}s + pause = {tts_total:.1f}s")
@@ -145,7 +146,7 @@ def main():
 
         # 씬 오디오 이어붙이기 (씬 사이 무음 포함)
         logger.info("씬 오디오 이어붙이기...")
-        build_scene_audio(scene_audio_paths, SCENE_PAUSE, tmp_audio)
+        build_scene_audio(scene_audio_paths, SCENE_PAUSE, tmp_audio, intro_pause_sec=1)
 
         logger.info("영상 합성 시작...")
         create_channel_video(

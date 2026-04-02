@@ -34,9 +34,11 @@ def build_scene_audio(
     scene_audio_paths: list[str],
     pause_sec: float,
     output_path: str,
+    intro_pause_sec: float = 0,
 ) -> float:
     """씬별 오디오를 무음(pause_sec초)으로 이어붙여 최종 오디오 생성.
 
+    intro_pause_sec: 첫 씬 앞에 삽입할 무음(초). run.py에서 image_durations[0]도 같은 값만큼 늘려야 싱크가 맞음.
     반환값: 총 재생 시간(초)
     """
     import tempfile
@@ -44,6 +46,16 @@ def build_scene_audio(
 
     with tempfile.TemporaryDirectory(prefix="scene_audio_") as tmp:
         parts: list[str] = []
+
+        # 첫 씬 앞 무음 (오프닝 끝난 직후 여유)
+        if intro_pause_sec > 0:
+            intro_sil = os.path.join(tmp, "intro_silence.m4a")
+            _run_ffmpeg([
+                "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
+                "-t", str(intro_pause_sec),
+                "-acodec", "aac", "-ab", "192k", "-y", intro_sil,
+            ], desc="intro_silence")
+            parts.append(intro_sil)
 
         for i, scene_path in enumerate(scene_audio_paths):
             # 씬 오디오 → AAC 변환
