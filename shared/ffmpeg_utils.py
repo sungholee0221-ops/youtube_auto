@@ -30,6 +30,54 @@ def probe_duration(path: str) -> float:
     return float(result.stdout.strip() or "0")
 
 
+def build_scene_audio(
+    scene_audio_paths: list[str],
+    pause_sec: float,
+    output_path: str,
+) -> float:
+    """씬별 오디오를 무음(pause_sec초)으로 이어붙여 최종 오디오 생성.
+
+    반환값: 총 재생 시간(초)
+    """
+    import tempfile
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix="scene_audio_") as tmp:
+        parts: list[str] = []
+
+        for i, scene_path in enumerate(scene_audio_paths):
+            # 씬 오디오 → AAC 변환
+            aac = os.path.join(tmp, f"scene_{i:03d}.m4a")
+            _run_ffmpeg([
+                "-i", scene_path,
+                "-acodec", "aac", "-ab", "192k", "-y", aac,
+            ], desc=f"scene_aac_{i}")
+            parts.append(aac)
+
+            # 씬 사이 무음 (마지막 씬 이후에도 추가)
+            silence = os.path.join(tmp, f"silence_{i:03d}.m4a")
+            _run_ffmpeg([
+                "-f", "lavfi", "-i", f"anullsrc=r=24000:cl=mono",
+                "-t", str(pause_sec),
+                "-acodec", "aac", "-ab", "192k", "-y", silence,
+            ], desc=f"silence_{i}")
+            parts.append(silence)
+
+        # 전체 이어붙이기
+        list_file = os.path.join(tmp, "audio_list.txt")
+        with open(list_file, "w") as f:
+            for p in parts:
+                f.write(f"file '{p}'\n")
+
+        _run_ffmpeg([
+            "-f", "concat", "-safe", "0", "-i", list_file,
+            "-acodec", "aac", "-ab", "192k", "-y", output_path,
+        ], desc="concat_scenes")
+
+    _check_output(output_path, "build_scene_audio")
+    return probe_duration(output_path)
+
+
 def _check_output(path: str, desc: str = "") -> None:
     """출력 파일이 0바이트인지 검사한다."""
     if not os.path.exists(path):

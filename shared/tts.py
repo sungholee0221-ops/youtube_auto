@@ -33,14 +33,14 @@ _VOICE_CONFIG = {
     "dino": {
         "name": "ko-KR-Wavenet-C",
         "ssmlGender": "MALE",
-        "speakingRate": 0.78,   # 느리게 — 씬별 duration_sec에 맞게 여유 있게 읽기
+        "speakingRate": 0.85,   # 씬 사이 무음 pause로 길이 확보 → 속도는 자연스럽게
         "pitch": -2.0,
     },
     "history": {
         "name": "ko-KR-Wavenet-D",   # 더 깊고 차분한 남성 목소리
         "ssmlGender": "MALE",
-        "speakingRate": 0.78,         # 더 느리게 (0.80 → 0.78)
-        "pitch": -4.0,                # 더 낮은 톤
+        "speakingRate": 0.82,         # 약간 느리게 (수면유도)
+        "pitch": -4.0,
     },
 }
 
@@ -163,6 +163,35 @@ def _split_text(text: str, limit: int = BYTE_LIMIT) -> list[str]:
         chunks.append(current)
 
     return chunks
+
+
+def synthesize_scenes(
+    scene_texts: list[str],
+    output_dir: str,
+    channel: str = "",
+) -> list[tuple[str, float]]:
+    """씬별 TTS를 개별 파일로 생성하고 (파일경로, 재생시간) 리스트를 반환한다.
+
+    각 씬의 TTS 길이를 정확히 측정하므로 이미지 싱크에 활용 가능.
+    """
+    import subprocess
+    from pathlib import Path as _Path
+    _Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    results: list[tuple[str, float]] = []
+    for i, text in enumerate(scene_texts):
+        path = os.path.join(output_dir, f"scene_{i:03d}.mp3")
+        synthesize_speech(text, path, channel=channel)
+        # 재생 시간 측정
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", path],
+            capture_output=True, text=True,
+        )
+        duration = float(probe.stdout.strip() or "0")
+        results.append((path, duration))
+        logger.info(f"씬 {i+1}/{len(scene_texts)} TTS: {duration:.1f}s")
+    return results
 
 
 def _synthesize_chunked(text: str, output_path: str, voice_cfg: dict | None = None) -> None:
