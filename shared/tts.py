@@ -102,14 +102,34 @@ def synthesize_speech(text: str, output_path: str, channel: str = "") -> str:
     return output_path
 
 
-def _synthesize_chunk(text: str, output_path: str, voice_cfg: dict | None = None) -> None:
-    """단일 청크 TTS (5000바이트 이하)."""
+def _text_to_ssml(text: str, sentence_pause_ms: int = 1000) -> str:
+    """문장 끝(. ! ?)마다 break 태그를 삽입한 SSML을 반환한다."""
+    # XML 특수문자 이스케이프
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    pause_tag = f'<break time="{sentence_pause_ms}ms"/>'
+    # 문장 끝 구두점 뒤 공백/줄바꿈 앞에 break 삽입
+    text = re.sub(r"([.!?])\s+", f"\\1{pause_tag} ", text)
+    # 줄 끝 문장부호
+    text = re.sub(r"([.!?])$", f"\\1{pause_tag}", text, flags=re.MULTILINE)
+    return f"<speak>{text}</speak>"
+
+
+def _synthesize_chunk(
+    text: str,
+    output_path: str,
+    voice_cfg: dict | None = None,
+    use_ssml: bool = False,
+) -> None:
+    """단일 청크 TTS (5000바이트 이하).
+
+    use_ssml=True 이면 text를 SSML로 전송한다.
+    """
     if voice_cfg is None:
         voice_cfg = _VOICE_CONFIG["default"]
     api_key = _get_api_key()
     url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={api_key}"
     body = {
-        "input": {"text": text},
+        "input": {"ssml": text} if use_ssml else {"text": text},
         "voice": {
             "languageCode": "ko-KR",
             "name": voice_cfg["name"],
@@ -169,20 +189,35 @@ def synthesize_scenes(
     scene_texts: list[str],
     output_dir: str,
     channel: str = "",
+    sentence_pause_ms: int = 1000,
 ) -> list[tuple[str, float]]:
     """씬별 TTS를 개별 파일로 생성하고 (파일경로, 재생시간) 리스트를 반환한다.
 
+    sentence_pause_ms: 문장 끝(. ! ?) 마다 삽입할 무음(ms). 0이면 비활성.
     각 씬의 TTS 길이를 정확히 측정하므로 이미지 싱크에 활용 가능.
     """
     import subprocess
     from pathlib import Path as _Path
     _Path(output_dir).mkdir(parents=True, exist_ok=True)
 
+    voice_cfg = _VOICE_CONFIG.get(channel, _VOICE_CONFIG["default"])
+    use_ssml  = sentence_pause_ms > 0
+
     results: list[tuple[str, float]] = []
     for i, text in enumerate(scene_texts):
         path = os.path.join(output_dir, f"scene_{i:03d}.mp3")
-        synthesize_speech(text, path, channel=channel)
-        # 재생 시간 측정
+
+        # SSML 변환 (문장 끝 pause 삽입)
+        tts_input = _text_to_ssml(text, sentence_pause_ms) if use_ssml else text
+        byte_size  = len(tts_input.encode("utf-8"))
+
+        if byte_size <= BYTE_LIMIT:
+            _synthesize_chunk(tts_input, path, voice_cfg, use_ssml=use_ssml)
+        else:
+            # SSML이 5000바이트 초과면 plain text chunked로 fallback
+            logger.warning(f"씬 {i+1} SSML이 {byte_size}bytes 초과 → plain text chunked 사용")
+            _synthesize_chunked(text, path, voice_cfg)
+
         probe = subprocess.run(
             ["ffprobe", "-v", "error", "-show_entries", "format=duration",
              "-of", "default=noprint_wrappers=1:nokey=1", path],
@@ -190,7 +225,7 @@ def synthesize_scenes(
         )
         duration = float(probe.stdout.strip() or "0")
         results.append((path, duration))
-        logger.info(f"씬 {i+1}/{len(scene_texts)} TTS: {duration:.1f}s")
+        logger.info(f"씬 {i+1}/{len(scene_texts)} TTS: {duration:.1f}s (ssml={use_ssml})")
     return results
 
 

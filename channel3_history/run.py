@@ -18,7 +18,8 @@
   HISTORY_SLIDESHOW_DURATION  슬라이드쇼 최소 길이(초), 기본 900 (15분)
   HISTORY_BLACK_DURATION      검은화면 길이(초), 기본 3000 (50분)
   HISTORY_FADEOUT_SEC         슬라이드쇼 끝 페이드아웃(초), 기본 3
-  HISTORY_SCENE_PAUSE         씬 사이 무음(초), 기본 5
+  HISTORY_SCENE_PAUSE         씬 사이 무음(초), 기본 3
+  HISTORY_SENTENCE_PAUSE_MS  문장 끝 pause(ms), 기본 1000
 """
 
 import os
@@ -41,10 +42,11 @@ logger = logging.getLogger(__name__)
 
 SOURCE_DIR    = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "channel3_source")
 OUTPUT_DIR    = os.environ.get("OUTPUT_DIR_HISTORY", "/Users/sungho/youtube_auto/b4_upload")
-SLIDESHOW_DUR = int(os.environ.get("HISTORY_SLIDESHOW_DURATION", "900"))   # 15분
-BLACK_DUR     = int(os.environ.get("HISTORY_BLACK_DURATION", "3000"))      # 50분
-FADEOUT_SEC   = int(os.environ.get("HISTORY_FADEOUT_SEC", "3"))
-SCENE_PAUSE   = float(os.environ.get("HISTORY_SCENE_PAUSE", "5"))
+SLIDESHOW_DUR      = int(os.environ.get("HISTORY_SLIDESHOW_DURATION", "900"))   # 15분
+BLACK_DUR          = int(os.environ.get("HISTORY_BLACK_DURATION", "3000"))      # 50분
+FADEOUT_SEC        = int(os.environ.get("HISTORY_FADEOUT_SEC", "3"))
+SCENE_PAUSE        = float(os.environ.get("HISTORY_SCENE_PAUSE", "3"))           # 씬 사이 무음
+SENTENCE_PAUSE_MS  = int(os.environ.get("HISTORY_SENTENCE_PAUSE_MS", "1000"))    # 문장 끝 pause
 
 
 def _load_source(folder_path: str) -> tuple[list[str], list[str]]:
@@ -113,8 +115,12 @@ def main():
             image_paths = image_paths + [image_paths[-1]] * (len(scene_texts) - n_img)
 
         # 씬별 TTS 개별 생성
-        logger.info(f"씬별 TTS 생성 중 (pause={SCENE_PAUSE}s)...")
-        scene_results = synthesize_scenes(scene_texts, tmp_scene_dir, channel="history")
+        logger.info(f"씬별 TTS 생성 중 (scene_pause={SCENE_PAUSE}s, sentence_pause={SENTENCE_PAUSE_MS}ms)...")
+        scene_results = synthesize_scenes(
+            scene_texts, tmp_scene_dir,
+            channel="history",
+            sentence_pause_ms=SENTENCE_PAUSE_MS,
+        )
 
         scene_audio_paths = [r[0] for r in scene_results]
         scene_durations   = [r[1] for r in scene_results]

@@ -1,15 +1,17 @@
 """
 채널 2 · 공룡이야기 자동화 (소스폴더 기반)
 
-영상 구조: 오프닝(원본음성) + 이미지 슬라이드쇼 + TTS
-오디오 구조: 오프닝 음성 → 씬1 TTS → 무음(5s) → 씬2 TTS → 무음(5s) → ...
+영상 구조: 오프닝(원본음성) + 이미지 슬라이드쇼 + 검은화면(10분 채우기)
+오디오 구조: 오프닝 음성 → 씬1 TTS → 무음(3s) → 씬2 TTS → 무음(3s) → ...
+             (각 TTS 내부: 문장 끝마다 1초 pause 자동 삽입)
 
-이미지 표시 시간 = 해당 씬 TTS 실측 길이 + pause_sec → 완벽한 싱크
-목표 10분 미달 시 마지막 이미지 연장.
+이미지 표시 시간 = 해당 씬 TTS 실측 길이 + scene_pause → 완벽한 싱크
+나레이션 끝난 뒤 나머지는 검은화면으로 채워 목표 10분 달성.
 
 환경변수:
-  DINO_TARGET_DURATION   슬라이드쇼 최소 길이(초), 기본 600 (10분)
-  DINO_SCENE_PAUSE       씬 사이 무음(초), 기본 5
+  DINO_TARGET_DURATION    총 영상 목표 길이(초), 기본 600 (10분)
+  DINO_SCENE_PAUSE        씬 사이 무음(초), 기본 3
+  DINO_SENTENCE_PAUSE_MS  문장 끝 pause(ms), 기본 1000
 """
 
 import os
@@ -25,15 +27,16 @@ from shared.file_utils import setup_logging, save_output, cleanup_temp, load_sou
 from shared.supabase_client import get_next_week, mark_week_used
 from shared.claude_api import generate_title_description
 from shared.tts import synthesize_scenes
-from shared.ffmpeg_utils import create_channel_video, capture_thumbnail, probe_duration, build_scene_audio
+from shared.ffmpeg_utils import create_channel_video, capture_thumbnail, build_scene_audio
 from shared.thumbnail import add_thumbnail_overlay
 
 logger = logging.getLogger(__name__)
 
-SOURCE_DIR      = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "channel2_source")
-OUTPUT_DIR      = os.environ.get("OUTPUT_DIR_DINO", "/Users/sungho/youtube_auto/b4_upload")
-TARGET_DURATION = int(os.environ.get("DINO_TARGET_DURATION", "600"))   # 10분
-SCENE_PAUSE     = float(os.environ.get("DINO_SCENE_PAUSE", "5"))       # 씬 사이 무음
+SOURCE_DIR         = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "channel2_source")
+OUTPUT_DIR         = os.environ.get("OUTPUT_DIR_DINO", "/Users/sungho/youtube_auto/b4_upload")
+TARGET_DURATION    = int(os.environ.get("DINO_TARGET_DURATION", "600"))       # 10분
+SCENE_PAUSE        = float(os.environ.get("DINO_SCENE_PAUSE", "3"))           # 씬 사이 무음
+SENTENCE_PAUSE_MS  = int(os.environ.get("DINO_SENTENCE_PAUSE_MS", "1000"))    # 문장 끝 pause
 
 
 def _load_source(folder_path: str) -> tuple[list[str], list[str]]:
@@ -42,10 +45,8 @@ def _load_source(folder_path: str) -> tuple[list[str], list[str]]:
     if not json_files:
         raise FileNotFoundError(f"JSON 파일 없음: {folder_path}")
 
-    data   = load_source_json(str(json_files[0]))
-    scenes = data["scenes"]
-
-    scene_texts = [s["narration_kr"] for s in scenes]
+    data        = load_source_json(str(json_files[0]))
+    scene_texts = [s["narration_kr"] for s in data["scenes"]]
 
     png_files = list(Path(folder_path).glob("*.png"))
 
@@ -80,11 +81,11 @@ def main():
     if not os.path.exists(opening_path):
         raise FileNotFoundError(f"오프닝 영상 없음: {opening_path}")
 
-    tmp_dir        = tempfile.mkdtemp(prefix="dino_")
-    tmp_scene_dir  = os.path.join(tmp_dir, "scenes")
-    tmp_audio      = os.path.join(tmp_dir, "narration.m4a")
-    tmp_video      = os.path.join(tmp_dir, "output.mp4")
-    tmp_thumb      = os.path.join(tmp_dir, "thumb.jpg")
+    tmp_dir       = tempfile.mkdtemp(prefix="dino_")
+    tmp_scene_dir = os.path.join(tmp_dir, "scenes")
+    tmp_audio     = os.path.join(tmp_dir, "narration.m4a")
+    tmp_video     = os.path.join(tmp_dir, "output.mp4")
+    tmp_thumb     = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
         logger.info("소스 JSON 로드 중...")
@@ -94,36 +95,34 @@ def main():
         if not image_paths:
             raise FileNotFoundError(f"PNG 이미지 없음: {folder_path}")
 
-        # 이미지 수가 씬 수보다 적으면 마지막 이미지로 나머지 씬 처리
-        n_img = len(image_paths)
-        if n_img < len(scene_texts):
-            logger.warning(f"이미지({n_img}) < 씬({len(scene_texts)}), 마지막 이미지 재사용")
-            image_paths = image_paths + [image_paths[-1]] * (len(scene_texts) - n_img)
+        # 이미지가 씬보다 적으면 마지막 이미지 재사용
+        if len(image_paths) < len(scene_texts):
+            logger.warning(f"이미지({len(image_paths)}) < 씬({len(scene_texts)}), 마지막 이미지 재사용")
+            image_paths += [image_paths[-1]] * (len(scene_texts) - len(image_paths))
 
-        # 씬별 TTS 개별 생성 + 실측 길이 확보
-        logger.info(f"씬별 TTS 생성 중 (pause={SCENE_PAUSE}s)...")
-        scene_results = synthesize_scenes(scene_texts, tmp_scene_dir, channel="dino")
-        # scene_results: [(path, duration), ...]
+        # 씬별 TTS (문장 끝 1초 pause 포함)
+        logger.info(f"씬별 TTS 생성 중 (scene_pause={SCENE_PAUSE}s, sentence_pause={SENTENCE_PAUSE_MS}ms)...")
+        scene_results = synthesize_scenes(
+            scene_texts, tmp_scene_dir,
+            channel="dino",
+            sentence_pause_ms=SENTENCE_PAUSE_MS,
+        )
 
-        # 이미지 표시 시간 = 씬 TTS 길이 + pause
         scene_audio_paths = [r[0] for r in scene_results]
         scene_durations   = [r[1] for r in scene_results]
-        image_durations   = [round(d + SCENE_PAUSE) for d in scene_durations]
+
+        # 이미지 표시 시간 = 씬 TTS 실측 + scene_pause
+        image_durations = [round(d + SCENE_PAUSE) for d in scene_durations]
+        slideshow_dur   = sum(image_durations)
+
+        # 나레이션 후 남은 시간 → 검은화면
+        black_screen_sec = max(0, TARGET_DURATION - slideshow_dur)
 
         tts_total = sum(scene_durations) + SCENE_PAUSE * len(scene_durations)
-        logger.info(f"TTS 합계: {sum(scene_durations):.1f}s + pause {SCENE_PAUSE*len(scene_durations):.0f}s = {tts_total:.1f}s")
+        logger.info(f"TTS 합계: {tts_total:.1f}s / 슬라이드쇼: {slideshow_dur}s / 검은화면: {black_screen_sec}s")
+        logger.info(f"이미지 표시 시간: {image_durations}")
 
-        # 목표 미달 시 마지막 이미지 연장
-        total_dur = sum(image_durations)
-        if total_dur < TARGET_DURATION:
-            pad = TARGET_DURATION - total_dur
-            image_durations[-1] += pad
-            logger.info(f"목표 미달로 마지막 씬 +{pad}s 연장 → {sum(image_durations)}s")
-
-        total_dur = sum(image_durations)
-        logger.info(f"최종 슬라이드쇼: {total_dur}s, 이미지 표시 시간: {image_durations}")
-
-        # 씬 오디오 이어붙이기 (씬 사이 무음 포함)
+        # 씬 오디오 이어붙이기
         logger.info("씬 오디오 이어붙이기...")
         build_scene_audio(scene_audio_paths, SCENE_PAUSE, tmp_audio)
 
@@ -135,7 +134,7 @@ def main():
             output_path=tmp_video,
             image_durations=image_durations,
             fadeout_sec=0,
-            black_screen_sec=0,
+            black_screen_sec=black_screen_sec,
         )
 
         capture_thumbnail(tmp_video, tmp_thumb)
@@ -153,6 +152,7 @@ def main():
         tags        = meta.get("tags", [])
         logger.info(f"생성된 제목: {title}")
 
+        total_dur      = slideshow_dur + black_screen_sec
         duration_label = f"{max(1, total_dur // 60)}min"
         result = save_output(
             video_path=tmp_video,
