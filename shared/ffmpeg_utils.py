@@ -40,27 +40,15 @@ def has_audio_track(path: str) -> bool:
     return bool(result.stdout.strip())
 
 
-def create_looped_video(
-    input_path: str,
-    output_path: str,
-    duration: int = 10800,
-) -> str:
-    """오디오 포함 영상을 duration초만큼 루프하여 단일 파일 생성.
-
-    Firefly 등 오디오 내장 영상 전용. rain_audio 불필요.
-    """
+def extract_audio(input_path: str, output_path: str) -> str:
+    """영상에서 오디오 트랙만 추출하여 AAC 파일로 저장."""
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     _run_ffmpeg([
-        "-stream_loop", "-1", "-i", input_path,
-        "-t", str(duration),
-        "-vf", "scale=1920:1080:force_original_aspect_ratio=decrease,"
-               "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24",
-        "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
-        "-pix_fmt", "yuv420p",
-        "-acodec", "aac", "-ab", "192k",
+        "-i", input_path,
+        "-vn", "-acodec", "aac", "-ab", "192k",
         "-y", output_path,
-    ], desc="looped_video_with_audio")
-    _check_output(output_path, "create_looped_video")
+    ], desc="extract_audio")
+    _check_output(output_path, "extract_audio")
     return output_path
 
 

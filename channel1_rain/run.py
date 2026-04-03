@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.file_utils import setup_logging, save_output, cleanup_temp
 from shared.supabase_client import get_unused_item, mark_as_used, reset_used_items
-from shared.ffmpeg_utils import create_rain_video, create_looped_video, has_audio_track, capture_thumbnail
+from shared.ffmpeg_utils import create_rain_video, extract_audio, has_audio_track, capture_thumbnail
 from shared.claude_api import generate_title_description
 from shared.thumbnail import add_thumbnail_overlay
 
@@ -67,15 +67,18 @@ def main():
     tmp_thumb = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
-        # 2. 영상 합성
+        # 2. 영상 합성 (공통: 15분 루프 + 검은화면 / 오디오만 소스 다름)
         if video_has_audio:
-            # Firefly 오디오 내장: 통째로 루프
-            logger.info(f"오디오 내장 영상 루프 (전체={VIDEO_DURATION}s)")
-            create_looped_video(visual_path, tmp_video, VIDEO_DURATION)
+            # Firefly: 내장 오디오 추출 → 3시간 루프 / 영상은 15분만
+            logger.info("오디오 내장 영상 — 오디오 추출 후 공통 합성")
+            extracted_audio = os.path.join(tmp_dir, "extracted_audio.m4a")
+            extract_audio(visual_path, extracted_audio)
+            audio_path = extracted_audio
         else:
-            # 무음 영상: 앞 15분 루프 + 검은화면 + 빗소리
-            logger.info(f"영상 합성 시작 (영상={VISUAL_DURATION}s / 전체={VIDEO_DURATION}s)")
-            create_rain_video(visual_path, audio_item["file_path"], tmp_video, VISUAL_DURATION, VIDEO_DURATION)
+            audio_path = audio_item["file_path"]
+
+        logger.info(f"영상 합성 시작 (영상={VISUAL_DURATION}s / 전체={VIDEO_DURATION}s)")
+        create_rain_video(visual_path, audio_path, tmp_video, VISUAL_DURATION, VIDEO_DURATION)
 
         # 3. 썸네일 캡처 + 오버레이
         capture_thumbnail(tmp_video, tmp_thumb)
