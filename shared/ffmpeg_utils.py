@@ -30,6 +30,40 @@ def probe_duration(path: str) -> float:
     return float(result.stdout.strip() or "0")
 
 
+def has_audio_track(path: str) -> bool:
+    """파일에 오디오 트랙이 있으면 True."""
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_streams", "-select_streams", "a",
+         "-of", "default=noprint_wrappers=1:nokey=1", path],
+        capture_output=True, text=True,
+    )
+    return bool(result.stdout.strip())
+
+
+def create_looped_video(
+    input_path: str,
+    output_path: str,
+    duration: int = 10800,
+) -> str:
+    """오디오 포함 영상을 duration초만큼 루프하여 단일 파일 생성.
+
+    Firefly 등 오디오 내장 영상 전용. rain_audio 불필요.
+    """
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    _run_ffmpeg([
+        "-stream_loop", "-1", "-i", input_path,
+        "-t", str(duration),
+        "-vf", "scale=1920:1080:force_original_aspect_ratio=decrease,"
+               "pad=1920:1080:(ow-iw)/2:(oh-ih)/2,fps=24",
+        "-vcodec", "libx264", "-crf", "23", "-preset", "fast",
+        "-pix_fmt", "yuv420p",
+        "-acodec", "aac", "-ab", "192k",
+        "-y", output_path,
+    ], desc="looped_video_with_audio")
+    _check_output(output_path, "create_looped_video")
+    return output_path
+
+
 def build_scene_audio(
     scene_audio_paths: list[str],
     pause_sec: float,

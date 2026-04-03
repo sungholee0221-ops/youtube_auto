@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.file_utils import setup_logging, save_output, cleanup_temp
 from shared.supabase_client import get_unused_item, mark_as_used, reset_used_items
-from shared.ffmpeg_utils import create_rain_video, capture_thumbnail
+from shared.ffmpeg_utils import create_rain_video, create_looped_video, has_audio_track, capture_thumbnail
 from shared.claude_api import generate_title_description
 from shared.thumbnail import add_thumbnail_overlay
 
@@ -43,30 +43,39 @@ def main():
     setup_logging("channel1_rain")
     logger.info("=== 채널 1 (비소리) 실행 시작 ===")
 
-    # 1. Supabase에서 영상/오디오 각각 조회 (독립 순환)
+    # 1. Supabase에서 영상 조회
     video_item = _fetch_with_reset("rain_video")
     if not video_item:
         logger.error("rain_video가 Supabase에 등록되지 않았습니다.")
         return
 
-    audio_item = _fetch_with_reset("rain_audio")
-    if not audio_item:
-        logger.error("rain_audio가 Supabase에 등록되지 않았습니다.")
-        return
-
     visual_path = video_item["file_path"]
-    audio_path  = audio_item["file_path"]
-    logger.info(f"영상 소스: {visual_path} (id={video_item['id']})")
-    logger.info(f"오디오 소스: {audio_path} (id={audio_item['id']})")
+    video_has_audio = has_audio_track(visual_path)
+    logger.info(f"영상 소스: {os.path.basename(visual_path)} (오디오내장={video_has_audio})")
+
+    # 오디오 내장 여부에 따라 rain_audio 조회 여부 결정
+    audio_item = None
+    if not video_has_audio:
+        audio_item = _fetch_with_reset("rain_audio")
+        if not audio_item:
+            logger.error("rain_audio가 Supabase에 등록되지 않았습니다.")
+            return
+        logger.info(f"오디오 소스: {os.path.basename(audio_item['file_path'])}")
 
     tmp_dir   = tempfile.mkdtemp(prefix="rain_")
     tmp_video = os.path.join(tmp_dir, "output.mp4")
     tmp_thumb = os.path.join(tmp_dir, "thumb.jpg")
 
     try:
-        # 2. 영상 합성 (앞 15분 Pexels + 나머지 검은 화면 + 빗소리 루프)
-        logger.info(f"영상 합성 시작 (영상={VISUAL_DURATION}s / 전체={VIDEO_DURATION}s)")
-        create_rain_video(visual_path, audio_path, tmp_video, VISUAL_DURATION, VIDEO_DURATION)
+        # 2. 영상 합성
+        if video_has_audio:
+            # Firefly 오디오 내장: 통째로 루프
+            logger.info(f"오디오 내장 영상 루프 (전체={VIDEO_DURATION}s)")
+            create_looped_video(visual_path, tmp_video, VIDEO_DURATION)
+        else:
+            # 무음 영상: 앞 15분 루프 + 검은화면 + 빗소리
+            logger.info(f"영상 합성 시작 (영상={VISUAL_DURATION}s / 전체={VIDEO_DURATION}s)")
+            create_rain_video(visual_path, audio_item["file_path"], tmp_video, VISUAL_DURATION, VIDEO_DURATION)
 
         # 3. 썸네일 캡처 + 오버레이
         capture_thumbnail(tmp_video, tmp_thumb)
@@ -103,9 +112,10 @@ def main():
         )
         logger.info(f"저장 완료: {result}")
 
-        # 6. Supabase 업데이트 (영상/오디오 독립)
+        # 6. Supabase 업데이트
         mark_as_used("generated_files", video_item["id"])
-        mark_as_used("generated_files", audio_item["id"])
+        if audio_item:
+            mark_as_used("generated_files", audio_item["id"])
 
     except Exception as e:
         logger.error(f"채널 1 실행 실패: {e}", exc_info=True)
