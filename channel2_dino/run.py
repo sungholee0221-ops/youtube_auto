@@ -39,8 +39,16 @@ SCENE_PAUSE        = float(os.environ.get("DINO_SCENE_PAUSE", "3"))           # 
 SENTENCE_PAUSE_MS  = int(os.environ.get("DINO_SENTENCE_PAUSE_MS", "1000"))    # 문장 끝 pause
 
 
-def _load_source(folder_path: str) -> tuple[list[str], list[str]]:
-    """JSON 읽기 → (씬별 나레이션 목록, 이미지 경로 목록)"""
+def _load_source(folder_path: str) -> tuple[list[str], list[list[str]]]:
+    """JSON 읽기 → (씬별 나레이션 목록, 씬별 샷 경로 목록)
+
+    파일명 패턴:
+      멀티샷: w01_s01_01_*.png, w01_s01_02_*.png  → shots_per_scene[0] = [샷1, 샷2, ...]
+      단일샷: Week01_S01_*.png                    → shots_per_scene[0] = [이미지]
+    두 형식 자동 감지 — 혼용 가능.
+    """
+    from itertools import groupby
+
     json_files = list(Path(folder_path).glob("*.json"))
     if not json_files:
         raise FileNotFoundError(f"JSON 파일 없음: {folder_path}")
@@ -50,12 +58,22 @@ def _load_source(folder_path: str) -> tuple[list[str], list[str]]:
 
     png_files = list(Path(folder_path).glob("*.png"))
 
-    def _scene_key(p: Path) -> int:
-        m = re.search(r"_S(\d+)[_.]", p.name, re.IGNORECASE)
-        return int(m.group(1)) if m else 999
+    def _shot_key(p: Path) -> tuple[int, int]:
+        # 멀티샷: _s01_01_ 형태
+        m = re.search(r"_s(\d+)_(\d+)[_.]", p.name, re.IGNORECASE)
+        if m:
+            return (int(m.group(1)), int(m.group(2)))
+        # 단일샷 구형: _S01_ 또는 _S01.
+        m2 = re.search(r"_S(\d+)[_.]", p.name, re.IGNORECASE)
+        return (int(m2.group(1)), 0) if m2 else (999, 0)
 
-    image_paths = [str(p) for p in sorted(png_files, key=_scene_key)]
-    return scene_texts, image_paths
+    sorted_files = sorted(png_files, key=_shot_key)
+
+    shots_per_scene = [
+        [str(f) for f in grp]
+        for _, grp in groupby(sorted_files, key=lambda p: _shot_key(p)[0])
+    ]
+    return scene_texts, shots_per_scene
 
 
 def main():
@@ -89,16 +107,17 @@ def main():
 
     try:
         logger.info("소스 JSON 로드 중...")
-        scene_texts, image_paths = _load_source(folder_path)
-        logger.info(f"씬 수: {len(scene_texts)}, 이미지: {len(image_paths)}장")
+        scene_texts, shots_per_scene = _load_source(folder_path)
+        shot_counts = [len(s) for s in shots_per_scene]
+        logger.info(f"씬 수: {len(scene_texts)}, 씬별 샷: {shot_counts}")
 
-        if not image_paths:
+        if not shots_per_scene:
             raise FileNotFoundError(f"PNG 이미지 없음: {folder_path}")
 
-        # 이미지가 씬보다 적으면 마지막 이미지 재사용
-        if len(image_paths) < len(scene_texts):
-            logger.warning(f"이미지({len(image_paths)}) < 씬({len(scene_texts)}), 마지막 이미지 재사용")
-            image_paths += [image_paths[-1]] * (len(scene_texts) - len(image_paths))
+        # 샷 그룹이 씬보다 적으면 마지막 샷 그룹 재사용
+        if len(shots_per_scene) < len(scene_texts):
+            logger.warning(f"샷그룹({len(shots_per_scene)}) < 씬({len(scene_texts)}), 마지막 샷 재사용")
+            shots_per_scene += [shots_per_scene[-1]] * (len(scene_texts) - len(shots_per_scene))
 
         # 씬별 TTS (문장 끝 1초 pause 포함)
         logger.info(f"씬별 TTS 생성 중 (scene_pause={SCENE_PAUSE}s, sentence_pause={SENTENCE_PAUSE_MS}ms)...")
@@ -111,17 +130,27 @@ def main():
         scene_audio_paths = [r[0] for r in scene_results]
         scene_durations   = [r[1] for r in scene_results]
 
-        # 이미지 표시 시간 = 씬 TTS 실측 + scene_pause
-        image_durations = [round(d + SCENE_PAUSE) for d in scene_durations]
-        image_durations[0] += 1  # 첫 씬: 오디오 1초 여유에 맞춰 표시 시간 연장
-        slideshow_dur   = sum(image_durations)
+        # 씬별 총 표시 시간 (TTS 실측 + scene_pause)
+        scene_total_durs = [round(d + SCENE_PAUSE) for d in scene_durations]
+        scene_total_durs[0] += 1  # 첫 씬: intro 1초 여유
 
-        # 나레이션 후 남은 시간 → 검은화면
+        # 샷별로 펼치기 (씬 duration을 샷 수로 균등 분할, 나머지는 마지막 샷에)
+        image_list      = []
+        image_durations = []
+        for shots, total_dur in zip(shots_per_scene, scene_total_durs):
+            n        = len(shots)
+            per_shot = total_dur // n
+            rem      = total_dur - per_shot * n
+            for j, shot in enumerate(shots):
+                image_list.append(shot)
+                image_durations.append(per_shot + (rem if j == n - 1 else 0))
+
+        slideshow_dur    = sum(image_durations)
         black_screen_sec = max(0, TARGET_DURATION - slideshow_dur)
 
         tts_total = sum(scene_durations) + SCENE_PAUSE * len(scene_durations)
         logger.info(f"TTS 합계: {tts_total:.1f}s / 슬라이드쇼: {slideshow_dur}s / 검은화면: {black_screen_sec}s")
-        logger.info(f"이미지 표시 시간: {image_durations}")
+        logger.info(f"샷 표시 시간: {image_durations}")
 
         # 씬 오디오 이어붙이기
         logger.info("씬 오디오 이어붙이기...")
@@ -130,7 +159,7 @@ def main():
         logger.info("영상 합성 시작...")
         create_channel_video(
             opening_path=opening_path,
-            image_list=image_paths,
+            image_list=image_list,
             audio_path=tmp_audio,
             output_path=tmp_video,
             image_durations=image_durations,
