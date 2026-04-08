@@ -40,6 +40,32 @@ def has_audio_track(path: str) -> bool:
     return bool(result.stdout.strip())
 
 
+def make_seamless_loop(input_path: str, output_path: str, crossfade_sec: float = 2.0) -> str:
+    """오디오 끝-시작 크로스페이드로 심리스 루프 버전 생성.
+
+    끝 crossfade_sec초와 처음 crossfade_sec초를 겹쳐 블렌딩 →
+    -stream_loop -1 루프 시 이음새 없음.
+    """
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    duration = probe_duration(input_path)
+    trim_end = max(crossfade_sec + 0.1, duration - crossfade_sec)
+    _run_ffmpeg([
+        "-i", input_path, "-i", input_path,
+        "-filter_complex", (
+            f"[0:a]atrim=0:{trim_end},asetpts=PTS-STARTPTS[body];"
+            f"[0:a]atrim={trim_end}:{duration},asetpts=PTS-STARTPTS[tail];"
+            f"[1:a]atrim=0:{crossfade_sec},asetpts=PTS-STARTPTS[head];"
+            f"[tail][head]acrossfade=d={crossfade_sec}:c1=exp:c2=exp[cf];"
+            f"[body][cf]concat=n=2:v=0:a=1[out]"
+        ),
+        "-map", "[out]",
+        "-acodec", "aac", "-ab", "192k",
+        "-y", output_path,
+    ], desc="make_seamless_loop")
+    _check_output(output_path, "make_seamless_loop")
+    return output_path
+
+
 def extract_audio(input_path: str, output_path: str) -> str:
     """영상에서 오디오 트랙만 추출하여 AAC 파일로 저장."""
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -257,9 +283,11 @@ def create_rain_video(
             "-c", "copy", "-y", combined,
         ], desc="rain_concat")
 
-        # 4. 오디오 루프
+        # 4. 오디오 심리스 전처리 → 루프
+        seamless_audio = os.path.join(tmp, "seamless.m4a")
+        make_seamless_loop(audio_path, seamless_audio, crossfade_sec=2.0)
         _run_ffmpeg([
-            "-stream_loop", "-1", "-i", audio_path,
+            "-stream_loop", "-1", "-i", seamless_audio,
             "-t", str(total_duration),
             "-acodec", "aac", "-ab", "192k",
             "-y", looped_audio,
